@@ -61,6 +61,10 @@ void main() async {
   FirebaseMessaging.onMessage.listen((event) {
     print(event.data.toString());
      print('on message');
+     print('on message');
+     print('on message');
+     print('on message');
+     print('on message');
   });
   FirebaseMessaging.onMessageOpenedApp.listen((event) {
     print(event.data.toString());
