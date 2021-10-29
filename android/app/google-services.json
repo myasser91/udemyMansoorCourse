@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "618380896500",
+    "project_id": "singular-carver-295814",
+    "storage_bucket": "singular-carver-295814.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618380896500:android:819a7f6303a92b00a156a1",
+        "android_client_info": {
+          "package_name": "com.example.messenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618380896500-nbrk0qrvs4qlj0bsaan8niqodec1kgj0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.messenger",
+            "certificate_hash": "c5d66baa2dd11b0a2eeaaec5a989f36e734edf6f"
+          }
+        },
+        {
+          "client_id": "618380896500-tvsestpqlqtl1peg192p8v8jl9056mdk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0691y0TYhUeoznY1aPKHnDlcK7ICCn1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618380896500-tvsestpqlqtl1peg192p8v8jl9056mdk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
