@@ -39,9 +39,8 @@ class NewsCubit extends Cubit<NewsStates> {
   }
 
   void getsearch(String value) {
-    
     emit(NewsGetSearchLoadingState());
-    
+
     DioHelper.getData(
       url: 'v2/everything',
       query: {
@@ -102,8 +101,7 @@ class NewsCubit extends Cubit<NewsStates> {
       isDark = fromshared;
     else
       isDark = !isDark;
-
-    CashHelper.prefs!.setBool('isDark', isDark).then((value) {
+    CashHelper.savedata(key: 'isDark', value: isDark).then((value) {
       emit(Darkmodetogglestate());
       print(isDark);
     });

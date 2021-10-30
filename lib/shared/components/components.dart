@@ -54,11 +54,12 @@ Widget defaultFormField({
   bool isclickable = true,
 }) =>
     TextFormField(
+      
       obscureText: isPass ? true : false,
       controller: controller,
       enabled: isclickable,
-      decoration: InputDecoration(
-        labelText: labelText,
+      decoration: InputDecoration(filled: true,
+        labelText: labelText,labelStyle: TextStyle(color: Colors.grey),
         prefixIcon: Icon(prefixIcon),
         suffixIcon: IconButton(
           icon: Icon(suffixIcon),

@@ -12,24 +12,26 @@ class AppTheme {
     primaryColor: defaultColor,
     textTheme: TextTheme(
       subtitle1: TextStyle(
-
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: Colors.black,
-      ) ,
+      ),
       bodyText1: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.bold,
         color: Colors.black,
-        
       ),
     ),
     appBarTheme: AppBarTheme(
       elevation: 0.0,
       color: Colors.transparent,
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        
       ),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -41,13 +43,14 @@ class AppTheme {
 
 class AppThemeDark {
   static ThemeData appthemedark = ThemeData(
+    
     textTheme: TextTheme(
+      caption: TextStyle(color: Colors.white),
       subtitle1: TextStyle(
-
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: Colors.white,
-      ) ,
+      ),
       bodyText1: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.bold,
@@ -63,6 +66,11 @@ class AppThemeDark {
     appBarTheme: AppBarTheme(
       elevation: 0.0,
       color: HexColor('333739'),
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
       ),

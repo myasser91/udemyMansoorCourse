@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:messenger/modules/ShopappModules/shopLoginScreen.dart';
 import 'package:messenger/models/PageModel.dart';
+import 'package:messenger/modules/social_app_modules/social_login_screen/social_login_screen.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/shared/components/constants.dart';
 import 'package:messenger/shared/shared.network/local/cash_Helper.dart';
@@ -90,7 +91,7 @@ class OnBoarding extends StatelessWidget {
   void submit(context) {
     CashHelper.savedata(key: 'onboarding', value: true).then((value) {
       if(value)
-      NavigateToreplace(context, ShopLoginScreen());
+      NavigateToreplace(context, SocialLoginScreen());
     });
   }
 

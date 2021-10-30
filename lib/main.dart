@@ -46,11 +46,10 @@ import 'package:hexcolor/hexcolor.dart';
 // ignore: unused_import
 import 'modules/otherModules/messenger/messengerscreen.dart';
 import 'shared/components/constants.dart';
+
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  
   print(message.data.toString());
   print('ON Backgorung message');
- 
 }
 
 void main() async {
@@ -60,15 +59,11 @@ void main() async {
   print(tooken);
   FirebaseMessaging.onMessage.listen((event) {
     print(event.data.toString());
-     print('on message');
-      
-
-    
+    print('on message');
   });
   FirebaseMessaging.onMessageOpenedApp.listen((event) {
     print(event.data.toString());
     print('on messages opend');
-    
   });
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -97,12 +92,20 @@ void main() async {
   print(' the uid in constants is = $uId');
   print(' the uid in cash helper =  ${CashHelper.getdata(key: 'uId')}');
 
-  if (uId != null) {
-    widget = SocialLayout();
-  } else {
-    widget = SocialLoginScreen();
-  }
+  if (onboarding == true) {
+    if (uId != null) {
+      widget = SocialLayout();
+    } else {
+      widget = SocialLoginScreen();
+    }
+  } else
+    widget = OnBoarding();
 
+  // if (uId != null) {
+  //   widget = SocialLayout();
+  // } else {
+  //   widget = SocialLoginScreen();
+  // }
   runApp(MyApp(isDark!, widget));
 }
 
@@ -136,7 +139,6 @@ class MyApp extends StatelessWidget {
   final bool isDark;
   Widget widget;
   MyApp(this.isDark, this.widget);
-
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
@@ -145,13 +147,14 @@ class MyApp extends StatelessWidget {
         //      // ..getBusiness()
         //       ..darkmodetoggle(fromshared: isDark),
         //   ),
-        BlocProvider(create: (BuildContext context) => Appcubit()),
+        BlocProvider(
+            create: (BuildContext context) =>
+                Appcubit()..darkmodetoggle(fromshared: isDark)),
         BlocProvider(
             create: (BuildContext context) => SocialCubit()
               ..getUserData()
               ..getposts()
               ..getUsers()),
-
         // //..getHomeData()..getFavorites()..getCategoryData()..getuser()
         // )
       ],

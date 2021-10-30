@@ -139,16 +139,16 @@ class Appcubit extends Cubit<Appstates> {
   }
 
 
-  var isDark = false;
+ var isDark = false;
   void darkmodetoggle({bool? fromshared}) async {
     if (fromshared != null)
       isDark = fromshared;
     else
       isDark = !isDark;
-
-    CashHelper.prefs!.setBool('isDark', isDark).then((value) {
+    CashHelper.savedata(key: 'isDark', value: isDark).then((value) {
       emit(Darkmodetogglestate());
-      print(isDark);
+      print('the is dark is $isDark');
+       print('the is dark is ${CashHelper.getdata(key: 'isDark')}');
     });
   }
 }

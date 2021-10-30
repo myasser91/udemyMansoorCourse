@@ -12,6 +12,8 @@ import 'package:messenger/modules/social_app_modules/newpost/newPostScreen.dart'
 import 'package:messenger/modules/social_app_modules/social_login_screen/social_login_screen.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/shared/components/constants.dart';
+import 'package:messenger/shared/cubit/cubit.dart';
+import 'package:messenger/shared/cubit/states.dart';
 import 'package:messenger/shared/shared.network/local/cash_Helper.dart';
 import 'package:messenger/styles/iconBroken.dart';
 
@@ -26,8 +28,7 @@ class SocialLayout extends StatelessWidget {
           NavigateTo(context, NewPostScreen());
         }
 
-        if (state is SocialGetUserSuccessState)
-        {
+        if (state is SocialGetUserSuccessState) {
           SocialCubit.get(context).getUsers();
         }
       },
@@ -38,20 +39,21 @@ class SocialLayout extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               cubit.titles[cubit.currentIndex],
-              style: TextStyle(color: Colors.black),
+              
             ),
             actions: [
-              IconButton(
-                  color: Colors.grey,
-                  onPressed: () {
+              BlocConsumer<Appcubit, Appstates>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  return IconButton(
+                      color: Colors.grey,
+                      onPressed: () {
+Appcubit.get(context).darkmodetoggle();
 
-
-                    print('the posts is ${SocialCubit.get(context).postsId}');
-           print('the likes is ${SocialCubit.get(context).likes}');
-            print('the comments is ${SocialCubit.get(context).comments}');
-            
-                  },
-                  icon: Icon(IconBroken.Search)),
+                      },
+                      icon: Icon(Icons.dark_mode_outlined));
+                },
+              ),
               IconButton(
                   color: Colors.grey,
                   onPressed: () {},
@@ -60,12 +62,12 @@ class SocialLayout extends StatelessWidget {
                   color: Colors.grey,
                   onPressed: () {
                     FirebaseAuth.instance.signOut();
-                    
+
                     SocialCubit.get(context).users = [];
-                    
+
                     SocialCubit.get(context).messages = [];
                     SocialCubit.get(context).firsttime = true;
-                    SocialCubit.get(context).firsttimechats  = true;
+                    SocialCubit.get(context).firsttimechats = true;
                     print(SocialCubit.get(context).users.length);
 
                     profileImage = null;
@@ -74,20 +76,21 @@ class SocialLayout extends StatelessWidget {
                     CashHelper.removedata(key: 'uId');
                     NavigateToreplace(context, SocialLoginScreen());
                     SocialCubit.get(context).currentIndex = 0;
-                     print(' the uid in constants is = $uId');
-  print(' the uid in cash helper =  ${CashHelper.getdata(key: 'uId')}');
+                    print(' the uid in constants is = $uId');
+                    print(
+                        ' the uid in cash helper =  ${CashHelper.getdata(key: 'uId')}');
                   },
                   icon: Icon(IconBroken.Logout)),
             ],
           ),
           body: Stack(
             children: [
-            
               cubit.screens[cubit.currentIndex],
               // if (!FirebaseAuth.instance.currentUser!.emailVerified)
               //   emailverification(),
-            if (state is SocialGetPostCommentsLoadingState)
-                  LinearProgressIndicator(), ],
+              if (state is SocialGetPostCommentsLoadingState)
+                LinearProgressIndicator(),
+            ],
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: cubit.currentIndex,
@@ -108,7 +111,6 @@ class SocialLayout extends StatelessWidget {
                   label: 'users', icon: Icon(IconBroken.User)),
               BottomNavigationBarItem(
                   label: 'settings', icon: Icon(IconBroken.Setting)),
-           
             ],
           ),
         );
