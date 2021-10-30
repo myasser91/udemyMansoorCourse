@@ -37,7 +37,8 @@ class SocialLoginScreen extends StatelessWidget {
                 key: 'uId',
                 value: state.uId,
               );
-              NavigateToreplace(context, SocialLayout());
+              
+             
             }
           },
           builder: (context, state) {
@@ -59,7 +60,7 @@ class SocialLoginScreen extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .headline3!
-                                .copyWith(color: Colors.deepOrange),
+                                .copyWith(color: Colors.teal),
                             // TextStyle(fontWeight: FontWeight.bold, fontSize: 50),
                           ),
                           SizedBox(
