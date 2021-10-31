@@ -99,6 +99,22 @@ flutter:
     - family: IconBroken
       fonts:
         - asset: lib/assets/fonts/icons.ttf
+  
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Regular.ttf
+        - asset: assets/fonts/Raleway-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Raleway-Black.ttf
+          weight: 900
+    - family: RobotoCondensed
+      fonts:
+        - asset: assets/fonts/RobotoCondensed-Bold.ttf
+        - asset: assets/fonts/RobotoCondensed-ilatic.ttf
+        - asset: assets/fonts/RobotoCondensed-Regular.ttf
+          weight: 700
+        - asset: assets/fonts/RobotoCondensed-Light.ttf
+          weight: 300
         
   #         style: italic
   #   - family: Trajan Pro
