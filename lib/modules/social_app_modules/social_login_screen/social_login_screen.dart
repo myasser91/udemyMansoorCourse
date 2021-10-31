@@ -23,9 +23,6 @@ class SocialLoginScreen extends StatelessWidget {
         ],
         child: BlocConsumer<SocialLogInCubit, SocialLoginStates>(
           listener: (context, state) {
-
-            
-          
             if (state is SocialLoginErrorState) {
               showToast(
                   t: state.error.toString(),
@@ -37,13 +34,10 @@ class SocialLoginScreen extends StatelessWidget {
                 key: 'uId',
                 value: state.uId,
               );
-              
-             
+              NavigateToreplace(context, SocialLayout());
             }
           },
           builder: (context, state) {
-
-            
             return Scaffold(
               appBar: AppBar(),
               body: Center(
@@ -131,18 +125,15 @@ class SocialLoginScreen extends StatelessWidget {
                               ? Center(child: CircularProgressIndicator())
                               : defaultButtom(
                                   onpress: () {
-
-                                  
                                     if (formkey.currentState?.validate() !=
                                         null) {
                                       SocialLogInCubit.get(context).userLogin(
                                           email: emailcontroller.text,
                                           password: passwordcontroller.text);
-                                          // SocialCubit.get(context).getUserData();
-                                          //  SocialCubit.get(context).getUsers();
-                                          
+                                      // SocialCubit.get(context).getUserData();
+                                      //  SocialCubit.get(context).getUsers();
+
                                     }
-                                    
                                   },
                                   text: 'login',
                                 ),

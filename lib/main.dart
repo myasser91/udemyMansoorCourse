@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,7 @@ import 'package:hexcolor/hexcolor.dart';
 // ignore: unused_import
 import 'modules/otherModules/messenger/messengerscreen.dart';
 import 'shared/components/constants.dart';
-
+import 'package:http/http.dart' as http;
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
   print('ON Backgorung message');
@@ -55,6 +56,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  
+
   var tooken = await FirebaseMessaging.instance.getToken();
   print(tooken);
   FirebaseMessaging.onMessage.listen((event) {

@@ -24,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
             listener: (context, state) {
           if (state is SocialCreateUserSuccessState) {
             CashHelper.savedata(key: 'uId', value: state.uId);
-            print(state.uId);
+            
 
             NavigateToreplace(context, SocialLayout());
           }

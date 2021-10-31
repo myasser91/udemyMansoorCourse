@@ -30,12 +30,10 @@ class SocialLogInCubit extends Cubit<SocialLoginStates> {
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) {
       uId = value.user!.uid;
-CashHelper.savedata(key: 'uId',value: value.user!.uid);
-   print(' the uid in constants is = $uId');
-  print(' the uid in cash helper =  ${CashHelper.getdata(key: 'uId')}');
+      CashHelper.savedata(key: 'uId', value: value.user!.uid);
 
       emit(SocialLoginSucsessState(value.user!.uid));
-    }). catchError((error) {
+    }).catchError((error) {
       emit(SocialLoginErrorState(error.toString()));
       print(error.toString());
     });

@@ -79,8 +79,7 @@ SocialUserModel model = SocialUserModel(
         .then((value) {
 
             uId = value.user!.uid;
-      print(value.user!.email!);
-      print(value.user!.uid);
+    
       createUser(name: name, email: email, phone: phone, uId: value.user!.uid);
      
     }).catchError((error) {

@@ -405,14 +405,14 @@ class SocialCubit extends Cubit<SocialStates> {
           likes.add(value.docs.length);
           postsId.add(element.id);
           posts.add(PostModel.fromJson(element.data()));
-           emit(SocialGetpostSuccessState());
-        }).catchError(((e){print(e.toString());}));
+          emit(SocialGetpostSuccessState());
+        }).catchError(((e) {
+          print(e.toString());
+        }));
       });
       emit(SocialGetpostSuccessState());
     }).catchError((error) {
-       emit(SocialGetpostErrorState(error.toString()));
-
-
+      emit(SocialGetpostErrorState(error.toString()));
     });
   }
 
