@@ -1,3 +1,5 @@
+import 'package:messenger/models/socialModels/postfeedsusermodel.dart';
+
 abstract class SocialStates {}
 
 class SocialInitialState extends SocialStates {}
@@ -77,12 +79,21 @@ class Socialremovepostimageerrorstate extends SocialStates {}
 ///posts
 class SocialGetpostLoadingState extends SocialStates {}
 
-class SocialGetpostSuccessState extends SocialStates {}
+
+class SocialgetlikesNumberSuccessState extends SocialStates{}
+class SocialGetpostSuccessState extends SocialStates {
+ 
+}
 
 class SocialGetpostErrorState extends SocialStates {
   final String error;
   SocialGetpostErrorState(this.error);
 }
+class SocialfeedsuserdataSuccess extends SocialStates{}
+class SocialfeedsuserdataLoading extends SocialStates{}
+
+class SocialfeedsuserdataErrror extends SocialStates{}
+
 
 ///// post likes
 ///
@@ -97,6 +108,7 @@ class SocialPostCommentErrorState extends SocialStates {
   SocialPostCommentErrorState(this.error);
 }
 class SocialPostlikesSuccessState extends SocialStates {}
+class SocialPostUNlikesSuccessState extends SocialStates {}
 
 class SocialPostlikeloadingState extends SocialStates {}
 
@@ -108,7 +120,8 @@ class SocialPostcommentloadingState extends SocialStates {}
 class SocialSendMessageSuccessState extends SocialStates{}
 class SocialSendMessageErrorState extends SocialStates{}
 class SocialgetMessageSuccessState extends SocialStates{}
-
+class SocialUpdatepostsdataSucessState extends SocialStates{}
+class SocialUpdatepostsdataErrorState extends SocialStates{}
 class SocialgetMessageLoadingState extends SocialStates{}
 
 class SocialgetMessageErrorState extends SocialStates{}

@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:buildcondition/buildcondition.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,7 +57,11 @@ Appcubit.get(context).darkmodetoggle();
               ),
               IconButton(
                   color: Colors.grey,
-                  onPressed: () {},
+                  onPressed: () {      
+
+SocialCubit.get(context).updatepostsdata();
+
+                      },
                   icon: Icon(IconBroken.Notification)),
               IconButton(
                   color: Colors.grey,

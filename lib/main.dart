@@ -159,8 +159,8 @@ class MyApp extends StatelessWidget {
               ..getUserData()
               ..getposts()
               ..getUsers()),
-        // //..getHomeData()..getFavorites()..getCategoryData()..getuser()
-        // )
+        //..getHomeData()..getFavorites()..getCategoryData()..getuser()
+        
       ],
       child: BlocConsumer<Appcubit, Appstates>(
         listener: (context, state) {},

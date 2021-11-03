@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +11,7 @@ import 'package:messenger/layouts/social_app/socialcubit/socialstates.dart';
 import 'package:messenger/models/socialModels/commentModel.dart';
 import 'package:messenger/models/socialModels/messageModel.dart';
 import 'package:messenger/models/socialModels/postModel%20.dart';
+import 'package:messenger/models/socialModels/postfeedsusermodel.dart';
 import 'package:messenger/models/socialModels/socialUserModel.dart';
 import 'package:messenger/modules/social_app_modules/chats/chatsScreen.dart';
 import 'package:messenger/modules/social_app_modules/feeds/feedsScreen.dart';
@@ -169,7 +172,9 @@ class SocialCubit extends Cubit<SocialStates> {
         .doc(uId)
         .update(model.toMap())
         .then((value) {
+     
       getUserData();
+       updatepostsdata();
     }).catchError((error) {
       emit(SocialUserUpdateErrorState());
     });
@@ -216,7 +221,6 @@ class SocialCubit extends Cubit<SocialStates> {
   }
 
   void uploadpostImage({
-    required String datetime,
     required String text,
     required String dateTime,
   }) {
@@ -229,9 +233,11 @@ class SocialCubit extends Cubit<SocialStates> {
       value.ref.getDownloadURL().then((value) {
         createPost(datetime: dateTime, text: text, postimage: value);
       }).catchError((error) {
+        print(error.toString());
         emit(SocialCreatePostErrorState());
       });
     }).catchError((error) {
+      print(error.toString());
       emit(SocialCreatePostErrorState());
     });
   }
@@ -275,7 +281,6 @@ class SocialCubit extends Cubit<SocialStates> {
       text: text,
       postimage: postimage ?? '',
     );
-
     FirebaseFirestore.instance
         .collection('posts')
         .add(model.toMap())
@@ -289,6 +294,7 @@ class SocialCubit extends Cubit<SocialStates> {
   void changeBottomNav(int index) {
     if (index == 4 && firsttime == true) {
       getUserData();
+      getpostsnumber();
       firsttime = false;
     }
     if (index == 1) {
@@ -330,6 +336,22 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
+  void unlikePost(String postid) {
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
+        .collection('Likes')
+        .doc(usermodel!.uId)
+        .delete()
+        .then((value) {
+      emit(SocialPostUNlikesSuccessState());
+      getposts();
+    }).catchError((error) {
+      error.toString();
+      emit(SocialPostlikeErrorState(error.toString()));
+    });
+  }
+
   void likePost(String postid) {
     FirebaseFirestore.instance
         .collection('posts')
@@ -337,9 +359,11 @@ class SocialCubit extends Cubit<SocialStates> {
         .collection('Likes')
         .doc(usermodel!.uId)
         .set({
+      'uId': usermodel!.uId,
       'like': true,
     }).then((value) {
       emit(SocialPostlikesSuccessState());
+      getposts();
     }).catchError((error) {
       error.toString();
       emit(SocialPostlikeErrorState(error.toString()));
@@ -363,9 +387,47 @@ class SocialCubit extends Cubit<SocialStates> {
 
   List<PostModel> posts = [];
   List<String> postsId = [];
-  List<int> likes = [];
-  List<int> comments = [];
   List<CommentModel> postComments = [];
+  List<String> postlikes = [];
+
+
+// void updatecommentsavatar()
+// {
+// FirebaseFirestore.instance.collection('posts').get().then((value) {
+//       value.docs.forEach((element) {
+//         element.reference.collection('comments').get()
+//         if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
+//           element.reference
+//               .update({'name': usermodel!.name, 'image': usermodel!.image})
+//               .then((_) {})
+//               .catchError((e) {
+//                 e.toString();
+//               });
+//         }
+//       });
+//     }).catchError((e) {
+//       print(e.toString());
+//     });
+
+// }
+ 
+  void updatepostsdata() {
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
+          element.reference
+              .update({'name': usermodel!.name, 'image': usermodel!.image})
+              .then((_) {})
+              .catchError((e) {
+                e.toString();
+              });
+        }
+      });
+      emit(SocialUpdatepostsdataSucessState());
+    }).catchError((e) {  emit(SocialUpdatepostsdataErrorState());
+      print(e.toString());
+    });
+  }
 
   void getPostComments(String? postId) {
     postComments = [];
@@ -380,39 +442,40 @@ class SocialCubit extends Cubit<SocialStates> {
       value.docs.forEach((element) {
         postComments.add(CommentModel.fromJson(element.data()));
       });
-
       emit(SocialGetPostCommentsSuccessState());
-      print(postComments.length);
     }).catchError((error) {
       emit(SocialGetPostCommentsErrorState());
     });
   }
 
-  void getposts() {
-    likes = [];
-    posts = [];
-    postsId = [];
-    comments = [];
-    users = [];
-    //emit(SocialGetpostLoadingState());
+  ///////////////waiting
+  void getPostLikes(String? postId) {
+    postlikes = [];
+    emit(SocialGetPostCommentsLoadingState());
     FirebaseFirestore.instance
         .collection('posts')
-        .orderBy('datetime')
+        .doc(postId)
+        .collection('likes')
         .get()
         .then((value) {
       value.docs.forEach((element) {
-        element.reference.collection('Likes').get().then((value) {
-          likes.add(value.docs.length);
-          postsId.add(element.id);
-          posts.add(PostModel.fromJson(element.data()));
-          emit(SocialGetpostSuccessState());
-        }).catchError(((e) {
-          print(e.toString());
-        }));
+        postlikes.add((element.data()['name']));
       });
-      emit(SocialGetpostSuccessState());
+      emit(SocialGetPostCommentsSuccessState());
     }).catchError((error) {
-      emit(SocialGetpostErrorState(error.toString()));
+      emit(SocialGetPostCommentsErrorState());
+    });
+  }
+
+  List<String> postuId = [];
+  List<LikesModel> likedpost = [];
+  List<dynamic> postsnumber = [];
+  void getpostsnumber() {
+    postsnumber = [];
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.data()['uId'] == uId) postsnumber.add(element.data());
+      });
     });
   }
 
@@ -460,7 +523,6 @@ class SocialCubit extends Cubit<SocialStates> {
   }
 
   List<MessageModel> messages = [];
-
   void getMessages({
     required String recieverId,
   }) {
@@ -479,6 +541,73 @@ class SocialCubit extends Cubit<SocialStates> {
         messages.add(MessageModel.fromJson(element.data()));
       });
       emit(SocialgetMessageSuccessState());
+    });
+  }
+
+  void getpostfeeduserdatasingle(String user, String postId) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user)
+        .get()
+        .then((value) {
+      postownerdetails.addAll({
+        postId: PostfeedUserData.fromJson(value.data()!),
+      });
+      //  print(value.data());
+    }).catchError((e) {});
+  }
+
+  Map<String, int> postsLikesbymap = ({});
+  Map<String, int> postsCommentsbymap = ({});
+  List<String> mylikedpostslist = [];
+  Map<String, PostfeedUserData> postownerdetails = ({});
+  List<PostModel> myposts = [];
+ Future< void> getposts()async {
+    postownerdetails = ({});
+    postsLikesbymap = ({});
+    postsCommentsbymap = ({});
+    mylikedpostslist = [];
+    posts = [];
+    postsId = [];
+    users = [];
+myposts = [];
+    emit(SocialGetpostLoadingState());
+    FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('time')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        if(element.data()['uId']== FirebaseAuth.instance.currentUser!.uid)
+        {
+ myposts.add(PostModel.fromJson(element.data()));
+        }
+        // getpostfeeduserdatasingle(element.data()['uId'], element.id);
+        element.reference.collection('comments').get().then((value) {
+          postsCommentsbymap.addAll({element.id: value.docs.length});
+        }).catchError((e) {
+          print(e.toString());
+        });
+
+        element.reference.collection('Likes').get().then((value) {
+          postsLikesbymap.addAll({element.id: value.docs.length});
+          postsId.add(element.id);
+          value.docs.forEach((e) {
+            if (e.id == usermodel!.uId!) {
+              mylikedpostslist.add(element.id);
+            }
+          });
+          posts.add(PostModel.fromJson(element.data()));
+          emit(SocialgetlikesNumberSuccessState());
+
+          emit(SocialGetpostSuccessState());
+        }).catchError(((e) {
+          print(e.toString());
+        }));
+      });
+      emit(SocialGetpostSuccessState());
+    }).catchError((error) {
+      emit(SocialGetpostErrorState(error.toString()));
     });
   }
 }

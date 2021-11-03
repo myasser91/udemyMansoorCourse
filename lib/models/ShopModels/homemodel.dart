@@ -8,9 +8,6 @@ class HomeModel {
     data = HomeDaTaModel.fromjson(json['data']);
   }
 }
-
-
-
 class HomeDaTaModel {
   List<BannerModel> banners = [];
   List<ProductsModel> products = [];
@@ -23,7 +20,6 @@ class HomeDaTaModel {
     });
   }
 }
-
 class BannerModel {
   int? id;
   String? image;

@@ -20,6 +20,8 @@ class NewPostScreen extends StatelessWidget {
 
         if(state is SocialCreatePostSuccessState)
         {SocialCubit.get(context).getposts();
+        SocialCubit.get(context).getpostsnumber();
+
         SocialCubit.get(context).removepostimage();
           Navigator.pop(context);
          // SocialCubit.get(context).removepostimage();
@@ -55,8 +57,8 @@ class NewPostScreen extends StatelessWidget {
                           datetime: now.toString(), text: textcontroller.text);
                     } else {
                       SocialCubit.get(context).uploadpostImage(
-                        datetime: now.toString(),
-                        text: textcontroller.text, dateTime:now.toString(),
+                        dateTime: now.toString(),
+                        text: textcontroller.text,
                       );
                     }
                   },

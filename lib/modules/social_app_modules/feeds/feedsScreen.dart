@@ -1,5 +1,5 @@
 // ignore_for_file: unused_import, must_be_immutable
-
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,21 +8,20 @@ import 'package:messenger/layouts/social_app/socialcubit/socialCubit.dart';
 import 'package:messenger/layouts/social_app/socialcubit/socialstates.dart';
 import 'package:messenger/models/socialModels/commentModel.dart';
 import 'package:messenger/models/socialModels/postModel%20.dart';
+import 'package:messenger/models/socialModels/postfeedsusermodel.dart';
 import 'package:messenger/models/users/usermodel.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/styles/iconBroken.dart';
 import 'package:path/path.dart';
 
 class FeedsScreen extends StatelessWidget {
-
   var commentcontroller = TextEditingController();
+  var indicatorcontroller = IndicatorController();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
-
-        if (state is SocialCommentonPostsuccessState)
-        {
+        if (state is SocialCommentonPostsuccessState) {
           commentcontroller.clear();
         }
         if (state is SocialGetPostCommentsSuccessState) {
@@ -35,69 +34,73 @@ class FeedsScreen extends StatelessWidget {
                       topRight: Radius.circular(20))),
               context: context,
               builder: (context) => Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ListView.separated(
-                    itemBuilder: (context, index) => buildCommentItem(
-                        SocialCubit.get(context).postComments[index]),
-                    separatorBuilder: (context, index) => SizedBox(
-                          height: 1,
-                        ),
-                    itemCount: SocialCubit.get(context).postComments.length),
-              ));
+                    padding: const EdgeInsets.all(20.0),
+                    child: ListView.separated(
+                        itemBuilder: (context, index) => buildCommentItem(
+                            SocialCubit.get(context).postComments[index]),
+                        separatorBuilder: (context, index) => SizedBox(
+                              height: 1,
+                            ),
+                        itemCount:
+                            SocialCubit.get(context).postComments.length),
+                  ));
         }
       },
       builder: (context, state) {
-      
         return BuildCondition(
-          condition:
-          SocialCubit.get(context).posts.length > 0 &&
-         // && SocialCubit.get(context).likes.length > 0  && SocialCubit.get(context).comments.length > 0 &&
-              SocialCubit.get(context).usermodel != null,
+          condition: SocialCubit.get(context).usermodel != null,
           fallback: (context) => Center(child: CircularProgressIndicator()),
-          builder: (context) => SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                Card(
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  elevation: 5,
-                  margin: EdgeInsets.all(5),
-                  child: Stack(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    children: [
-                      Image(
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          height: 200,
-                          image: NetworkImage(
-                              'https://image.freepik.com/free-photo/terrifed-young-woman-warns-you-about-something-indicates-aside-with-fore-finger-keeps-mouth-widely-opened-stares-with-bugged-eyes-isolated-pink-wall-advertising-concept_273609-2957.jpg')),
-                      Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text(
-                          'communicate with friends',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(color: Colors.white),
+          builder: (context) => RefreshIndicator(onRefresh: ()=> SocialCubit.get(context).getposts(),displacement: 20,edgeOffset: 20,
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  Card(
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    elevation: 5,
+                    margin: EdgeInsets.all(5),
+                    child: Stack(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      children: [
+                        Image(
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            height: 200,
+                            image: NetworkImage(
+                                'https://image.freepik.com/free-photo/terrifed-young-woman-warns-you-about-something-indicates-aside-with-fore-finger-keeps-mouth-widely-opened-stares-with-bugged-eyes-isolated-pink-wall-advertising-concept_273609-2957.jpg')),
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                            'communicate with friends',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                ListView.separated(
-                  itemCount: SocialCubit.get(context).posts.length,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) => buildPostItem(
-                      SocialCubit.get(context).posts[index],
-                      context,
-                      index,
-                      commentcontroller),
-                  separatorBuilder: (context, index) => SizedBox(
-                    height: 1,
+                  ListView.separated(
+                    itemCount: SocialCubit.get(context).posts.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) => buildPostItem(
+                        SocialCubit.get(context).postownerdetails,
+                        SocialCubit.get(context).mylikedpostslist,
+                        SocialCubit.get(context).postsLikesbymap,
+                        SocialCubit.get(context).postsCommentsbymap,
+                        SocialCubit.get(context).postsId[index],
+                        SocialCubit.get(context).posts[index],
+                        context,
+                        index,
+                        commentcontroller),
+                    separatorBuilder: (context, index) => SizedBox(
+                      height: 1,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -106,7 +109,15 @@ class FeedsScreen extends StatelessWidget {
   }
 
   Widget buildPostItem(
-      PostModel model, context, index, TextEditingController t) {
+      Map<String, PostfeedUserData> postownerdetails,
+      List<String> mylikedpostslist,
+      Map<String, int> likes,
+      Map<String, int> comments,
+      String ids,
+      PostModel model,
+      context,
+      index,
+      TextEditingController t) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8),
       child: Card(
@@ -122,7 +133,9 @@ class FeedsScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundImage: NetworkImage('${model.image}'),
+                    backgroundImage: NetworkImage(model.image!),
+
+                    //  NetworkImage('${postownerdetails[ids]!.image!}'),
                   ),
                   SizedBox(
                     width: 20,
@@ -134,7 +147,8 @@ class FeedsScreen extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              '${model.name}',
+                              model.name!,
+                              //       '${postownerdetails[ids]!.name!}',
                               style: TextStyle(height: 1.3),
                             ),
                             Icon(
@@ -155,7 +169,8 @@ class FeedsScreen extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {                      
+                      },
                       icon: Icon(
                         Icons.more_horiz,
                         size: 16,
@@ -200,11 +215,13 @@ class FeedsScreen extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.favorite_border,
-                                color: Colors.grey[300],
+                                color: likes[ids]! > 0
+                                    ? Colors.red[300]
+                                    : Colors.grey[300],
                                 size: 20,
                               ),
                               Text(
-                                '${SocialCubit.get(context).likes[index]}',
+                                likes[ids].toString(),
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ],
@@ -215,23 +232,51 @@ class FeedsScreen extends StatelessWidget {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          SocialCubit.get(context).getPostComments(
-                              SocialCubit.get(context).postsId[index]);
+                          SocialCubit.get(context).getPostComments(ids);
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              // Icon(
-                              //   Icons.chat,
-                              //   color: Colors.grey[300],
-                              //   size: 20,
-                              // ),
                               Text(
-                                'Comments',
-                                style: Theme.of(context).textTheme.caption,
+                                comments[ids].toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      color: comments[ids]! > 0
+                                          ? Colors.blueAccent
+                                          : Colors.grey,
+                                    ),
                               ),
+                              SizedBox(
+                                width: 1.5,
+                              ),
+                              if (comments[ids] == 1)
+                                Text(
+                                  'comment',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: comments[ids]! > 0
+                                            ? Colors.blueAccent
+                                            : Colors.grey,
+                                      ),
+                                ),
+                              if (comments[ids] != 1)
+                                Text(
+                                  'comments',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: comments[ids]! > 0
+                                            ? Colors.blueAccent
+                                            : Colors.grey,
+                                      ),
+                                ),
                             ],
                           ),
                         ),
@@ -286,7 +331,7 @@ class FeedsScreen extends StatelessWidget {
                               SocialCubit.get(context).comment(
                                 userImage:
                                     SocialCubit.get(context).usermodel!.image!,
-                                postid: SocialCubit.get(context).postsId[index],
+                                postid: ids,
                                 dateTime: now.toString(),
                                 userId:
                                     SocialCubit.get(context).usermodel!.uId!,
@@ -294,26 +339,53 @@ class FeedsScreen extends StatelessWidget {
                               );
                             },
                             icon: Icon(IconBroken.Send)),
-                        InkWell(
-                          onTap: () {
-                            SocialCubit.get(context).likePost(
-                                SocialCubit.get(context).postsId[index]);
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Icon(
-                                Icons.favorite,
-                                color: Colors.grey[300],
-                                size: 20,
-                              ),
-                              Text(
-                                'like',
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                            ],
+                        if (mylikedpostslist.contains(ids))
+                          InkWell(
+                            onTap: () {
+                              SocialCubit.get(context).unlikePost(ids);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                if (mylikedpostslist.contains(ids))
+                                  Icon(
+                                    Icons.favorite,
+                                    color: Colors.red[300],
+                                    size: 20,
+                                  ),
+                                if (!mylikedpostslist.contains(ids))
+                                  Icon(
+                                    Icons.favorite,
+                                    color: Colors.grey[300],
+                                    size: 20,
+                                  ),
+                                Text(
+                                  ' unlike',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        if (!mylikedpostslist.contains(ids))
+                          InkWell(
+                            onTap: () {
+                              SocialCubit.get(context).likePost(ids);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.grey[300],
+                                  size: 20,
+                                ),
+                                Text(
+                                  'like',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -341,14 +413,15 @@ class FeedsScreen extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.blue[100],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 5,bottom: 5,left: 5,right: 2.5),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.only(
+                      top: 5, bottom: 5, left: 5, right: 2.5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         model.text!,
