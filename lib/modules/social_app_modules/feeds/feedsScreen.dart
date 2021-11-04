@@ -9,7 +9,11 @@ import 'package:messenger/layouts/social_app/socialcubit/socialstates.dart';
 import 'package:messenger/models/socialModels/commentModel.dart';
 import 'package:messenger/models/socialModels/postModel%20.dart';
 import 'package:messenger/models/socialModels/postfeedsusermodel.dart';
+import 'package:messenger/models/socialModels/storyModel.dart';
 import 'package:messenger/models/users/usermodel.dart';
+import 'package:messenger/modules/social_app_modules/addnewStory.dart';
+import 'package:messenger/modules/social_app_modules/settings/settingsScreen.dart';
+import 'package:messenger/modules/social_app_modules/story.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/styles/iconBroken.dart';
 import 'package:path/path.dart';
@@ -21,6 +25,11 @@ class FeedsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
+
+        if(state is SocialStoryImagePicckedSuccessState)
+        {
+           NavigateTo(context, AddStory());
+        }
         if (state is SocialCommentonPostsuccessState) {
           commentcontroller.clear();
         }
@@ -50,36 +59,57 @@ class FeedsScreen extends StatelessWidget {
         return BuildCondition(
           condition: SocialCubit.get(context).usermodel != null,
           fallback: (context) => Center(child: CircularProgressIndicator()),
-          builder: (context) => RefreshIndicator(onRefresh: ()=> SocialCubit.get(context).getposts(),displacement: 20,edgeOffset: 20,
+          builder: (context) => RefreshIndicator(
+            onRefresh: () => SocialCubit.get(context).getposts(),
+            displacement: 20,
+            edgeOffset: 20,
             child: SingleChildScrollView(
               physics: BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  Card(
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    elevation: 5,
-                    margin: EdgeInsets.all(5),
-                    child: Stack(
-                      alignment: AlignmentDirectional.bottomEnd,
-                      children: [
-                        Image(
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            height: 200,
-                            image: NetworkImage(
-                                'https://image.freepik.com/free-photo/terrifed-young-woman-warns-you-about-something-indicates-aside-with-fore-finger-keeps-mouth-widely-opened-stares-with-bugged-eyes-isolated-pink-wall-advertising-concept_273609-2957.jpg')),
-                        Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Text(
-                            'communicate with friends',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1!
-                                .copyWith(color: Colors.white),
+                 
+                  Row(crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(onTap: (){
+                        SocialCubit.get(context).getStoryImage();
+                       
+                      },
+                        child: Container(width: 50,height: 50,
+                      
+                          child: Column(mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Stack(alignment: AlignmentDirectional.bottomCenter,
+                                children: [
+                                  CircleAvatar(radius: 25,backgroundImage: NetworkImage(SocialCubit.get(context).usermodel!.image!),),
+                                  Transform.translate(offset: Offset(0, 10),
+                                    child: CircleAvatar(backgroundColor: Colors.blue[800],
+                                      child: Icon(Icons.add,color: Colors.white,size: 15,),
+                                    radius: 10,),
+                                  ),
+                                ],
+                              ),
+                           ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+
+                      Expanded(
+                        child: Container(height: 70,
+                                    
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context,index) => buildstoryitem(context,SocialCubit.get(context).stories[index],),
+                        itemCount: SocialCubit.get(context).stories.length,
+                        separatorBuilder: (context, index) => SizedBox(
+                          width: 20,
+                        ),
+                                      ),
+                                    ),
+                                  ),
+                      ),
+                    ],
                   ),
                   ListView.separated(
                     itemCount: SocialCubit.get(context).posts.length,
@@ -168,13 +198,18 @@ class FeedsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {                      
-                      },
-                      icon: Icon(
-                        Icons.more_horiz,
-                        size: 16,
-                      ))
+                  if (model.uId == FirebaseAuth.instance.currentUser!.uid)
+                    PopupMenuButton(
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                        PopupMenuItem(height: 7,
+                          onTap: () {
+                            SocialCubit.get(context).deletepost(ids);
+                          },
+                          child: Text('remove'),
+                        ),
+                      ],
+                    )
+                 
                 ],
               ),
               Padding(
@@ -436,4 +471,49 @@ class FeedsScreen extends StatelessWidget {
       ),
     );
   }
+
+ Widget buildstoryitem(context, StoryModel model ) => Container(
+        width: 40,
+        child: InkWell(
+          onTap: (){           
+            NavigateTo(context, Story(id: model.uId,));          
+            print( model.uId);
+          },
+          child: Column(
+            children: [
+              Stack(
+                alignment: AlignmentDirectional.bottomEnd,
+                children: [
+                  CircleAvatar(
+                    radius: 20.0,
+                    backgroundImage: NetworkImage(
+                        model.storyimage!),
+                  ),
+                  CircleAvatar(
+                    radius: 6.0,
+                    backgroundColor: Colors.white,
+                  ),
+                  CircleAvatar(
+                    radius: 5.0,
+                    backgroundColor: Colors.green,
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  top: 3.0,
+                ),
+                child: Text(
+                  model.name!,
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontSize: 10,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 }

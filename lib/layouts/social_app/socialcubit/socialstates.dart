@@ -22,6 +22,16 @@ class SocialGetAllUsersErrorState extends SocialStates {
   SocialGetAllUsersErrorState(this.error);
 }
 
+
+
+class SocialGetStoriesSuccessState extends SocialStates{}
+class SocialGetStoriesLoadingState extends SocialStates{}
+class SocialGetStoriesErrorState extends SocialStates{}
+class SocialGetStoriesperpersonSuccessState extends SocialStates{}
+class SocialGetStoriesperpersonLoadingState extends SocialStates{}
+class SocialGetStoriesperpersonErrorState extends SocialStates{}
+
+
 class SocialChangeBottomNavState extends SocialStates {}
 
 class SocialNewPostState extends SocialStates {}
@@ -29,6 +39,9 @@ class SocialNewPostState extends SocialStates {}
 class SocialProfileImagePicckedSuccessState extends SocialStates {}
 
 class SocialProfileImagePicckedErrorState extends SocialStates {}
+class SocialStoryImagePicckedSuccessState extends SocialStates {}
+
+class SocialStoryImagePicckedErrorState extends SocialStates {}
 class SocialMessageImagePicckedSuccessState extends SocialStates {}
 
 class SocialMessageImagePicckedErrorState extends SocialStates {}
@@ -40,6 +53,8 @@ class SocialCoverImagePicckedErrorState extends SocialStates {}
 class SocialProfileImageUploadSuccessState extends SocialStates {}
 
 class SocialProfileImageUploadErrorState extends SocialStates {}
+class SocialStoryImageUploadSuccessState extends SocialStates {}
+class SocialStoryImageUploadErrorState extends SocialStates {}
 
 class SocialCoverImageUploadSuccessState extends SocialStates {}
 
@@ -116,6 +131,11 @@ class SocialPostcommentSuccessState extends SocialStates {}
 
 class SocialPostcommentloadingState extends SocialStates {}
 
+class SocialDeletePostLoadingState extends SocialStates{}
+class SocialDeletePostSuccessState extends SocialStates{}
+
+class SocialDeletePostErrorState extends SocialStates{}
+
 
 class SocialSendMessageSuccessState extends SocialStates{}
 class SocialSendMessageErrorState extends SocialStates{}
@@ -140,3 +160,8 @@ class SocialCommentonPostsuccessState extends SocialStates{
 class SocialCommentonPostErrorState extends SocialStates{
   
 }
+class SocialCreateStoryLoadingState extends SocialStates {}
+
+class SocialCreateStoryErrorState extends SocialStates {}
+
+class SocialCreateStorySuccessState extends SocialStates {}

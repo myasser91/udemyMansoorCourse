@@ -22,7 +22,7 @@ class ChatsScreen extends StatelessWidget {
             fallback: (context) => Center(child: CircularProgressIndicator()),
             builder: (context) => ListView.separated(
                 physics: BouncingScrollPhysics(),
-                itemBuilder: (context, index) => buildcommentitem(
+                itemBuilder: (context, index) => buildChatItem(
                     context, SocialCubit.get(context).users[index]),
                 separatorBuilder: (context, index) => SizedBox(
                       height: 5,
@@ -34,7 +34,7 @@ class ChatsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildcommentitem(context, SocialUserModel model) {
+  Widget buildChatItem(context, SocialUserModel model) {
     return InkWell(
       onTap: () {
         NavigateTo(context, ChatDetailsScreen(userModel: model));

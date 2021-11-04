@@ -34,6 +34,7 @@ import 'package:messenger/modules/otherModules/userscreen/userscreen.dart';
 import 'package:messenger/modules/social_app_modules/chats/chatsScreen.dart';
 import 'package:messenger/modules/social_app_modules/social_Register_screen/home.dart';
 import 'package:messenger/modules/social_app_modules/social_login_screen/social_login_screen.dart';
+import 'package:messenger/modules/social_app_modules/story.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/shared/components/themes.dart';
 import 'package:messenger/shared/cubit/cubit.dart';

@@ -90,8 +90,7 @@ class OnBoarding extends StatelessWidget {
 
   void submit(context) {
     CashHelper.savedata(key: 'onboarding', value: true).then((value) {
-      if(value)
-      NavigateToreplace(context, SocialLoginScreen());
+      if (value) NavigateToreplace(context, SocialLoginScreen());
     });
   }
 

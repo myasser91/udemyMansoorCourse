@@ -1,4 +1,5 @@
 import 'package:buildcondition/buildcondition.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger/layouts/social_app/socialcubit/socialCubit.dart';
@@ -15,165 +16,157 @@ class SocialSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  BlocConsumer<SocialCubit, SocialStates>(
-          listener: (context, state) {
-if (state is SocialGetPostCommentsSuccessState) {
-          showModalBottomSheet(
-              backgroundColor: Colors.grey[300],
-              elevation: 20,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20))),
-              context: context,
-              builder: (context) => Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ListView.separated(
-                        itemBuilder: (context, index) => buildCommentItem(
-                            SocialCubit.get(context).postComments[index]),
-                        separatorBuilder: (context, index) => SizedBox(
-                              height: 1,
+    return BlocConsumer<SocialCubit, SocialStates>(listener: (context, state) {
+      if (state is SocialGetPostCommentsSuccessState) {
+        showModalBottomSheet(
+            backgroundColor: Colors.grey[300],
+            elevation: 20,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20))),
+            context: context,
+            builder: (context) => Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ListView.separated(
+                      itemBuilder: (context, index) => buildCommentItem(
+                          SocialCubit.get(context).postComments[index]),
+                      separatorBuilder: (context, index) => SizedBox(
+                            height: 1,
+                          ),
+                      itemCount: SocialCubit.get(context).postComments.length),
+                ));
+      }
+    }, builder: (context, state) {
+      var userModel = SocialCubit.get(context).usermodel;
+      var commentcontroller = TextEditingController();
+      return BuildCondition(
+        fallback: (context) => Center(child: CircularProgressIndicator()),
+        condition: userModel != null,
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: RefreshIndicator(
+            onRefresh: () => SocialCubit.get(context).getposts(),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
                             ),
-                        itemCount:
-                            SocialCubit.get(context).postComments.length),
-                  ));
-        }
-
-            
-          },
-          builder: (context, state) {
-            var userModel = SocialCubit.get(context).usermodel;
-var commentcontroller = TextEditingController();
-            return BuildCondition(
-              fallback: (context) => Center(child: CircularProgressIndicator()),
-              condition: userModel != null && SocialCubit.get(context).myposts.length>0&&
-             
-                        
-                         
-                         SocialCubit.get(context).postsId.length> 0 &&
-                          SocialCubit.get(context).myposts.length > 0,
-              builder: (context) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: RefreshIndicator(onRefresh: ()=> SocialCubit.get(context).getposts(),
-                  child: SingleChildScrollView(
-                    child: Column(
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(userModel!.coverimage!)),
+                          )),
+                      Transform.translate(
+                        offset: Offset(0, 50),
+                        child: CircleAvatar(
+                          radius: 55,
+                          backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(userModel.image!),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 55, width: double.infinity),
+                  Text(
+                    userModel.name!,
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    userModel.bio!,
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Stack(
-                          alignment: AlignmentDirectional.bottomCenter,
-                          children: [
-                            Container(
-                                width: double.infinity,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(4),
-                                    topRight: Radius.circular(4),
-                                  ),
-                                  image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(userModel!.coverimage!)),
-                                )),
-                            Transform.translate(
-                              offset: Offset(0, 50),
-                              child: CircleAvatar(
-                                radius: 55,
-                                backgroundColor:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage: NetworkImage(userModel.image!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 55, width: double.infinity),
-                        Text(
-                          userModel.name!,
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          userModel.bio!,
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        InkWell(
+                          onTap: () {},
+                          child: Column(
                             children: [
-                              InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text('${SocialCubit.get(context).postsnumber.length}',
-                                        style:
-                                            Theme.of(context).textTheme.bodyText1),
-                                    Text('post',
-                                        style: Theme.of(context).textTheme.caption),
-                                  ],
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text('250',
-                                        style:
-                                            Theme.of(context).textTheme.bodyText1),
-                                    Text('photos',
-                                        style: Theme.of(context).textTheme.caption),
-                                  ],
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text('100',
-                                        style:
-                                            Theme.of(context).textTheme.bodyText1),
-                                    Text('following',
-                                        style: Theme.of(context).textTheme.caption),
-                                  ],
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text('10k',
-                                        style:
-                                            Theme.of(context).textTheme.bodyText1),
-                                    Text('followers',
-                                        style: Theme.of(context).textTheme.caption),
-                                  ],
-                                ),
-                              ),
+                              Text(
+                                  '${SocialCubit.get(context).postsnumber.length}',
+                                  style: Theme.of(context).textTheme.bodyText1),
+                              Text('post',
+                                  style: Theme.of(context).textTheme.caption),
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: OutlinedButton(
-                              onPressed: () {},
-                              child: Text('add photos'),
-                            )),
-                            SizedBox(
-                              width: 3,
-                            ),
-                            OutlinedButton(
-                              onPressed: () { 
-                                NavigateTo(context, EditProfileScreen());
-                              },
-                              child: Icon(IconBroken.Edit),
-                            )
-                          ],
+                        InkWell(
+                          onTap: () {},
+                          child: Column(
+                            children: [
+                              Text('250',
+                                  style: Theme.of(context).textTheme.bodyText1),
+                              Text('photos',
+                                  style: Theme.of(context).textTheme.caption),
+                            ],
+                          ),
                         ),
-                         ListView.separated(
+                        InkWell(
+                          onTap: () {},
+                          child: Column(
+                            children: [
+                              Text('100',
+                                  style: Theme.of(context).textTheme.bodyText1),
+                              Text('following',
+                                  style: Theme.of(context).textTheme.caption),
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {},
+                          child: Column(
+                            children: [
+                              Text('10k',
+                                  style: Theme.of(context).textTheme.bodyText1),
+                              Text('followers',
+                                  style: Theme.of(context).textTheme.caption),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: OutlinedButton(
+                        onPressed: () {},
+                        child: Text('add photos'),
+                      )),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      OutlinedButton(
+                        onPressed: () {
+                          NavigateTo(context, EditProfileScreen());
+                        },
+                        child: Icon(IconBroken.Edit),
+                      )
+                    ],
+                  ),
+                  BuildCondition(
+                    condition: SocialCubit.get(context).myposts.length > 0,
+                    fallback: (context) =>
+                        Container(width: double.infinity,height: 150,),
+                    builder: (context) => ListView.separated(
                       itemCount: SocialCubit.get(context).myposts.length,
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
@@ -191,19 +184,17 @@ var commentcontroller = TextEditingController();
                         height: 1,
                       ),
                     ),
-                                ],
-                    
-                      
-                    ),
                   ),
-                ),
+                ],
               ),
-            );
-          }
-    );
+            ),
+          ),
+        ),
+      );
+    });
   }
 
-Widget buildPostItem(
+  Widget buildPostItem(
       Map<String, PostfeedUserData> postownerdetails,
       List<String> mylikedpostslist,
       Map<String, int> likes,
@@ -228,11 +219,9 @@ Widget buildPostItem(
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundImage:
-                    
-                     NetworkImage(model.image!),
+                    backgroundImage: NetworkImage(model.image!),
 
-                      //  NetworkImage('${postownerdetails[ids]!.image!}'),
+                    //  NetworkImage('${postownerdetails[ids]!.image!}'),
                   ),
                   SizedBox(
                     width: 20,
@@ -244,8 +233,8 @@ Widget buildPostItem(
                         Row(
                           children: [
                             Text(
-                       model.name!,
-                       //       '${postownerdetails[ids]!.name!}',
+                              model.name!,
+                              //       '${postownerdetails[ids]!.name!}',
                               style: TextStyle(height: 1.3),
                             ),
                             Icon(
@@ -265,12 +254,17 @@ Widget buildPostItem(
                       ],
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.more_horiz,
-                        size: 16,
-                      ))
+                  if (model.uId == FirebaseAuth.instance.currentUser!.uid)
+                    PopupMenuButton(
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                        PopupMenuItem(
+                          onTap: () {
+                            SocialCubit.get(context).deletepost(ids);
+                          },
+                          child: Text('remove'),
+                        ),
+                      ],
+                    )
                 ],
               ),
               Padding(
@@ -309,10 +303,11 @@ Widget buildPostItem(
                           padding: const EdgeInsets.only(top: 5),
                           child: Row(
                             children: [
-                       
                               Icon(
                                 Icons.favorite_border,
-                                color:likes[ids]! > 0? Colors.red[300]:Colors.grey[300],
+                                color: likes[ids]! > 0
+                                    ? Colors.red[300]
+                                    : Colors.grey[300],
                                 size: 20,
                               ),
                               Text(
@@ -336,19 +331,42 @@ Widget buildPostItem(
                             children: [
                               Text(
                                 comments[ids].toString(),
-                                style: Theme.of(context).textTheme.caption!.copyWith(color: comments[ids]! > 0? Colors.blueAccent:Colors.grey,),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      color: comments[ids]! > 0
+                                          ? Colors.blueAccent
+                                          : Colors.grey,
+                                    ),
                               ),
-                             SizedBox(width: 1.5,),
-                            if (comments[ids] == 1)
-                              Text(
-                                'comment',
-                                style: Theme.of(context).textTheme.caption!.copyWith(color: comments[ids]! > 0? Colors.blueAccent:Colors.grey,),
+                              SizedBox(
+                                width: 1.5,
                               ),
-                            if (comments[ids] != 1)
-                              Text(
-                                'comments',
-                                style: Theme.of(context).textTheme.caption!.copyWith(color: comments[ids]! > 0? Colors.blueAccent:Colors.grey,),
-                              ),
+                              if (comments[ids] == 1)
+                                Text(
+                                  'comment',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: comments[ids]! > 0
+                                            ? Colors.blueAccent
+                                            : Colors.grey,
+                                      ),
+                                ),
+                              if (comments[ids] != 1)
+                                Text(
+                                  'comments',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: comments[ids]! > 0
+                                            ? Colors.blueAccent
+                                            : Colors.grey,
+                                      ),
+                                ),
                             ],
                           ),
                         ),
@@ -411,16 +429,14 @@ Widget buildPostItem(
                               );
                             },
                             icon: Icon(IconBroken.Send)),
-                    
-                    if (mylikedpostslist.contains(ids))
-                     InkWell(
+                        if (mylikedpostslist.contains(ids))
+                          InkWell(
                             onTap: () {
                               SocialCubit.get(context).unlikePost(ids);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                
                                 if (mylikedpostslist.contains(ids))
                                   Icon(
                                     Icons.favorite,
@@ -439,33 +455,27 @@ Widget buildPostItem(
                                 ),
                               ],
                             ),
-                          )
-                      ,
-                      if (!mylikedpostslist.contains(ids))
-                       InkWell(
+                          ),
+                        if (!mylikedpostslist.contains(ids))
+                          InkWell(
                             onTap: () {
                               SocialCubit.get(context).likePost(ids);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                
-                               
-                                  Icon(
-                                    Icons.favorite,
-                                    color: Colors.grey[300],
-                                    size: 20,
-                                  ),
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.grey[300],
+                                  size: 20,
+                                ),
                                 Text(
                                   'like',
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ],
                             ),
-                          )
-                        
-                          ,
-                          
+                          ),
                       ],
                     ),
                   ),
@@ -517,6 +527,3 @@ Widget buildPostItem(
     );
   }
 }
-
-  
-

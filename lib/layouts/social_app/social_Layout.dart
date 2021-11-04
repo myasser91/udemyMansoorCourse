@@ -40,7 +40,6 @@ class SocialLayout extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               cubit.titles[cubit.currentIndex],
-              
             ),
             actions: [
               BlocConsumer<Appcubit, Appstates>(
@@ -49,19 +48,21 @@ class SocialLayout extends StatelessWidget {
                   return IconButton(
                       color: Colors.grey,
                       onPressed: () {
-Appcubit.get(context).darkmodetoggle();
-
+                        Appcubit.get(context).darkmodetoggle();
+                        SocialCubit.get(context).sumstories();
                       },
                       icon: Icon(Icons.dark_mode_outlined));
                 },
               ),
               IconButton(
                   color: Colors.grey,
-                  onPressed: () {      
-
-SocialCubit.get(context).updatepostsdata();
-
-                      },
+                  onPressed: () {
+                    print(SocialCubit.get(context).storiesperperson.length);
+                    print(SocialCubit.get(context).stories.length);
+                    print(SocialCubit.get(context).stories);
+                    print('the edited length ${SocialCubit.get(context).sotriesedited.length}');
+                    
+                  },
                   icon: Icon(IconBroken.Notification)),
               IconButton(
                   color: Colors.grey,
