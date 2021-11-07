@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:messenger/layouts/shopApp/cubit/shopcubit.dart';
 import 'package:messenger/models/ShopModels/favoritesModel.dart';
 import 'package:messenger/models/ShopModels/homemodel.dart';
@@ -17,7 +18,7 @@ import 'package:tbib_toast/tbib_toast.dart';
 Widget defaultButtom({
   double width = double.infinity,
   Color background = Colors.black,
-  double radius = 0.0,
+  double radius = 30,
   required Function onpress,
   required String text,
   Color bottomcolor = defaultColor,
@@ -27,14 +28,14 @@ Widget defaultButtom({
       decoration: BoxDecoration(
           color: bottomcolor, borderRadius: BorderRadius.circular(radius)),
       width: width,
-      height: 40,
+      height: 50,
       child: MaterialButton(
         onPressed: () {
           onpress();
         },
         child: Text(
           text.toUpperCase(),
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.bold ),
         ),
       ),
     );

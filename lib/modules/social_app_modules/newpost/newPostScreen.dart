@@ -135,7 +135,7 @@ class NewPostScreen extends StatelessWidget {
                     children: [
                       Container(
                           width: double.infinity,
-                          height: 300,
+                          height: 250,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(4),

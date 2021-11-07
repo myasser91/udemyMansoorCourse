@@ -10,10 +10,18 @@ import 'package:messenger/shared/shared.network/local/cash_Helper.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class OnBoarding extends StatelessWidget {
+class OnBoarding extends StatefulWidget {
+  @override
+  State<OnBoarding> createState() => _OnBoardingState();
+}
+
+class _OnBoardingState extends State<OnBoarding> {
   int currentindex = 0;
+
   bool isLast = false;
+
   var boardController = PageController();
+
   List<OnBoardingPagemodel> pages = [];
 
   Widget build(BuildContext context) {
@@ -33,6 +41,9 @@ class OnBoarding extends StatelessWidget {
                 onPageChanged: (index) {
                   if (index == pages.length - 1) {
                     isLast = true;
+                     setState(() {
+                     
+                   });
                   } else
                     isLast = false;
                 },
@@ -53,7 +64,7 @@ class OnBoarding extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SmoothPageIndicator(
@@ -66,7 +77,10 @@ class OnBoarding extends StatelessWidget {
                         dotWidth: 10,
                         spacing: 5),
                   ),
-                  Spacer(),
+                if(isLast== true)
+                 Spacer(),
+                   if(isLast== true)
+                  
                   FloatingActionButton(
                       backgroundColor: defaultColor,
                       onPressed: () {
@@ -79,6 +93,7 @@ class OnBoarding extends StatelessWidget {
                         }
                       },
                       child: Icon(Icons.arrow_forward_ios))
+               
                 ],
               ),
             ),
@@ -98,18 +113,18 @@ class OnBoarding extends StatelessWidget {
     pages = [];
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/social1.png',
+          'images/850.png',
         ),
-        title: 'Hello'));
+        title: 'connect with friends instantly'));
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/social2.png',
+          'images/878.png',
         ),
-        title: 'Welcome'));
+        title: 'share your moments to the world '));
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/social3.png',
+          'images/670.png',
         ),
-        title: 'To OUR SHOP'));
+        title: 'make a new friends every day'));
   }
 }

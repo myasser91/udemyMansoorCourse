@@ -123,7 +123,7 @@ class SocialLoginScreen extends StatelessWidget {
                           ),
                           state is SocialLoginLoadingState
                               ? Center(child: CircularProgressIndicator())
-                              : defaultButtom(
+                              : defaultButtom(radius: 30,width: 350,
                                   onpress: () {
                                     if (formkey.currentState?.validate() !=
                                         null) {
