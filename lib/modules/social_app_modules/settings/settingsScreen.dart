@@ -418,7 +418,7 @@ class SocialSettingsScreen extends StatelessWidget {
                         IconButton(
                             onPressed: () {
                               var now = DateTime.now();
-                              SocialCubit.get(context).comment(
+                              SocialCubit.get(context).comment(name:  SocialCubit.get(context).usermodel!.name!,
                                 userImage:
                                     SocialCubit.get(context).usermodel!.image!,
                                 postid: ids,

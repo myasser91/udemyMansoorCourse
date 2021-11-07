@@ -49,7 +49,7 @@ class SocialLayout extends StatelessWidget {
                       color: Colors.grey,
                       onPressed: () {
                         Appcubit.get(context).darkmodetoggle();
-                        SocialCubit.get(context).sumstories();
+                      print(SocialCubit.get(context).usermodel!.name!);
                       },
                       icon: Icon(Icons.dark_mode_outlined));
                 },
@@ -57,10 +57,7 @@ class SocialLayout extends StatelessWidget {
               IconButton(
                   color: Colors.grey,
                   onPressed: () {
-                    print(SocialCubit.get(context).storiesperperson.length);
-                    print(SocialCubit.get(context).stories.length);
-                    print(SocialCubit.get(context).stories);
-                    print('the edited length ${SocialCubit.get(context).sotriesedited.length}');
+                  SocialCubit.get(context).checkstorytimefordelete();
                     
                   },
                   icon: Icon(IconBroken.Notification)),

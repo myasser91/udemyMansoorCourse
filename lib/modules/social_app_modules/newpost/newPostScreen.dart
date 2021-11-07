@@ -17,14 +17,13 @@ class NewPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
+        if (state is SocialCreatePostSuccessState) {
+          SocialCubit.get(context).getposts();
+          SocialCubit.get(context).getpostsnumber();
 
-        if(state is SocialCreatePostSuccessState)
-        {SocialCubit.get(context).getposts();
-        SocialCubit.get(context).getpostsnumber();
-
-        SocialCubit.get(context).removepostimage();
+          SocialCubit.get(context).removepostimage();
           Navigator.pop(context);
-         // SocialCubit.get(context).removepostimage();
+          // SocialCubit.get(context).removepostimage();
         }
       },
       builder: (context, state) {
@@ -51,13 +50,21 @@ class NewPostScreen extends StatelessWidget {
                   onPressed: () {
                     var now = DateTime.now();
 
-                    print(now.toString());
+                  
                     if (SocialCubit.get(context).postimage == null) {
-                      SocialCubit.get(context).createPost(
-                          datetime: now.toString(), text: textcontroller.text);
+
+                      if(textcontroller.text != '')
+                      {
+ SocialCubit.get(context).createPost(
+                          datetime:
+                              '${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}   ${now.hour.toString().padLeft(2, '0')}-${now.minute.toString().padLeft(2, '0')}',
+                          text: textcontroller.text);
+                      }
+                     
                     } else {
                       SocialCubit.get(context).uploadpostImage(
-                        dateTime: now.toString(),
+                        dateTime: '${now.year.toString()}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}   ${now.hour.toString().padLeft(2, '0')}-${now.minute.toString().padLeft(2, '0')}',
+                        
                         text: textcontroller.text,
                       );
                     }
@@ -83,8 +90,7 @@ class NewPostScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(
-                          cubit.usermodel!.image!),
+                      backgroundImage: NetworkImage(cubit.usermodel!.image!),
                     ),
                     SizedBox(
                       width: 20,
@@ -115,10 +121,9 @@ class NewPostScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextFormField(
-                    
-                  keyboardType: TextInputType.multiline,
-                  maxLines:null,
-                   controller: textcontroller,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    controller: textcontroller,
                     decoration: InputDecoration(
                         hintText: 'What is on your mind ...  ',
                         border: InputBorder.none),
@@ -130,21 +135,23 @@ class NewPostScreen extends StatelessWidget {
                     children: [
                       Container(
                           width: double.infinity,
-                          height: 200,
+                          height: 300,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(4),
                                 topRight: Radius.circular(4),
                               ),
                               image: DecorationImage(
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 image: FileImage(
                                     SocialCubit.get(context).postimage!),
                               ))),
-                      CircleAvatar(radius: 20,backgroundColor: Colors.blue,
-                        child: IconButton(iconSize: 16,
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.blue,
+                        child: IconButton(
+                            iconSize: 16,
                             onPressed: () {
-
                               SocialCubit.get(context).removepostimage();
                             },
                             icon: Icon(IconBroken.Close_Square)),

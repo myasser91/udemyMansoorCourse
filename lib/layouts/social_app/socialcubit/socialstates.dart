@@ -150,18 +150,22 @@ class SocialgetMessageErrorState extends SocialStates{}
 class SocialGetPostCommentsLoadingState extends SocialStates{}
 class SocialGetPostCommentsSuccessState extends SocialStates{}
 class SocialGetPostCommentsErrorState extends SocialStates{}
+class SocialdeleteCommentLoadingState extends SocialStates{}
+class SocialdeleteCommentSuccessState extends SocialStates{}
+class SocialdeleteCommentErrorState extends SocialStates{}
 
-class SocialCommentonPostLoadingState extends SocialStates{
-
-}
-class SocialCommentonPostsuccessState extends SocialStates{
-  
-}
-class SocialCommentonPostErrorState extends SocialStates{
-  
-}
+class SocialCommentonPostLoadingState extends SocialStates{}
+class SocialCommentonPostsuccessState extends SocialStates{}
+class SocialCommentonPostErrorState extends SocialStates{}
 class SocialCreateStoryLoadingState extends SocialStates {}
-
 class SocialCreateStoryErrorState extends SocialStates {}
-
 class SocialCreateStorySuccessState extends SocialStates {}
+class SocialGetsinglePostLoading extends SocialStates {}
+class SocialGetsinglePostSuccess extends SocialStates {}
+class SocialGetSinglepostLikesSuccess extends SocialStates{}
+class SocialGetSinglepostCommentsSuccess extends SocialStates{}
+
+
+
+class SocialGetsinglePostError extends SocialStates {}
+

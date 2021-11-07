@@ -35,6 +35,20 @@ class SocialCubit extends Cubit<SocialStates> {
   bool firsttimechats = true;
   SocialUserModel? usermodel;
   int currentIndex = 0;
+  Map<String, int> postsLikesbymap = ({});
+  Map<String, int> postsCommentsbymap = ({});
+  List<String> mylikedpostslist = [];
+  Map<String, PostfeedUserData> postownerdetails = ({});
+  List<PostModel> myposts = [];
+  List<StoryModel> stories = [];
+  List<StoryModel> storiesperperson = [];
+  List<String> postuId = [];
+  List<LikesModel> likedpost = [];
+  List<dynamic> postsnumber = [];
+  List<PostModel> posts = [];
+  List<String> postsId = [];
+  List<CommentModel> postComments = [];
+  List<String> postlikes = [];
 
   List<Widget> screens = [
     FeedsScreen(),
@@ -384,16 +398,20 @@ class SocialCubit extends Cubit<SocialStates> {
 
   void comment(
       {required String postid,
+     
+      required String name,
       required String userImage,
       required String userId,
       required String text,
       required String dateTime}) {
     CommentModel model = CommentModel(
+     
       text: text,
       dateTime: dateTime,
       postid: postid,
       userId: userId,
       userImage: usermodel!.image!,
+      name: name,
     );
     emit(SocialCommentonPostLoadingState());
     FirebaseFirestore.instance
@@ -402,44 +420,21 @@ class SocialCubit extends Cubit<SocialStates> {
         .collection('comments')
         .add(model.toMap())
         .then((value) {
+      print('the comment id is ${value.id}');
+      FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postid)
+          .collection('comments')
+          .doc(value.id)
+          .update({'commentId': value.id})
+          .then((_) {})
+          .catchError(onError);
+
       emit(SocialCommentonPostsuccessState());
+      getSinglePost(postid);
     }).catchError((error) {
       emit(SocialCommentonPostErrorState());
       print(error.toString());
-    });
-  }
-
-  void unlikePost(String postid) {
-    FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postid)
-        .collection('Likes')
-        .doc(usermodel!.uId)
-        .delete()
-        .then((value) {
-      emit(SocialPostUNlikesSuccessState());
-      getposts();
-    }).catchError((error) {
-      error.toString();
-      emit(SocialPostlikeErrorState(error.toString()));
-    });
-  }
-
-  void likePost(String postid) {
-    FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postid)
-        .collection('Likes')
-        .doc(usermodel!.uId)
-        .set({
-      'uId': usermodel!.uId,
-      'like': true,
-    }).then((value) {
-      emit(SocialPostlikesSuccessState());
-      getposts();
-    }).catchError((error) {
-      error.toString();
-      emit(SocialPostlikeErrorState(error.toString()));
     });
   }
 
@@ -457,11 +452,6 @@ class SocialCubit extends Cubit<SocialStates> {
       emit(SocialGetAllUsersErrorState(error.toString()));
     });
   }
-
-  List<PostModel> posts = [];
-  List<String> postsId = [];
-  List<CommentModel> postComments = [];
-  List<String> postlikes = [];
 
 // void updatecommentsavatar()
 // {
@@ -484,7 +474,7 @@ class SocialCubit extends Cubit<SocialStates> {
 // }
 
   void updatepostsdata() {
-    FirebaseFirestore.instance.collection('posts').get().then((value) {
+    FirebaseFirestore.instance.collection('stories').get().then((value) {
       value.docs.forEach((element) {
         if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
           element.reference
@@ -499,6 +489,59 @@ class SocialCubit extends Cubit<SocialStates> {
     }).catchError((e) {
       emit(SocialUpdatepostsdataErrorState());
       print(e.toString());
+    });
+
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        element.reference.collection('comments').get().then((value) {
+          value.docs.forEach((element) {
+            if (element.data()['userId'] ==
+                FirebaseAuth.instance.currentUser!.uid) {
+              element.reference
+                  .update({'name': usermodel!.name, 'userImage': usermodel!.image})
+                  .then((_) {})
+                  .catchError((e) {
+                    e.toString();
+                  });
+            }
+          });
+        }).catchError(onError);
+
+        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
+          element.reference
+              .update({'name': usermodel!.name, 'image': usermodel!.image})
+              .then((_) {})
+              .catchError((e) {
+                e.toString();
+              });
+        }
+      });
+      emit(SocialUpdatepostsdataSucessState());
+    }).catchError((e) {
+      emit(SocialUpdatepostsdataErrorState());
+      print(e.toString());
+    });
+  }
+
+  void deletesinglecomment(String postid, String commentId) {
+    emit(SocialdeleteCommentLoadingState());
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
+        .collection('comments')
+        .doc(commentId)
+        .delete()
+        .then((_) {
+         
+          getPostComments(postid);
+          getSinglePost(postid);
+          
+      emit(SocialdeleteCommentSuccessState());
+      
+
+    }).catchError((e) {
+      print(e.toString());
+      emit(SocialdeleteCommentErrorState());
     });
   }
 
@@ -540,9 +583,6 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  List<String> postuId = [];
-  List<LikesModel> likedpost = [];
-  List<dynamic> postsnumber = [];
   void getpostsnumber() {
     postsnumber = [];
     FirebaseFirestore.instance.collection('posts').get().then((value) {
@@ -635,6 +675,33 @@ class SocialCubit extends Cubit<SocialStates> {
     FirebaseFirestore.instance
         .collection('posts')
         .doc(postid)
+        .collection('comments')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        element.reference.delete();
+        emit(SocialDeletePostSuccessState());
+        getposts();
+        getpostsnumber();
+      });
+    }).catchError(onError);
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
+        .collection('Likes')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        element.reference.delete();
+        emit(SocialDeletePostSuccessState());
+        getposts();
+        getpostsnumber();
+      });
+    }).catchError(onError);
+
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
         .delete()
         .then((value) {
       emit(SocialDeletePostSuccessState());
@@ -646,23 +713,15 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  Map<String, int> postsLikesbymap = ({});
-  Map<String, int> postsCommentsbymap = ({});
-  List<String> mylikedpostslist = [];
-  Map<String, PostfeedUserData> postownerdetails = ({});
-  List<PostModel> myposts = [];
-  List<StoryModel> stories = [];
-  List<StoryModel> storiesperperson = [];
-
-void getStoriesperperson(String id) {
+  void getStoriesperperson(String id) {
     storiesperperson = [];
     emit(SocialGetStoriesperpersonLoadingState());
     FirebaseFirestore.instance.collection('stories').get().then((value) {
       value.docs.forEach((element) {
-       if(element.data()['uId']== id){
-           storiesperperson.add(StoryModel.fromJson(element.data()));
-        }       
-       
+        if (element.data()['uId'] == id) {
+          storiesperperson.add(StoryModel.fromJson(element.data()));
+        }
+
         emit(SocialGetStoriesperpersonSuccessState());
       });
     }).catchError((e) {
@@ -671,32 +730,62 @@ void getStoriesperperson(String id) {
     });
   }
 
-List<StoryModel>  sotriesedited= [];
-void sumstories (){
-  sotriesedited= [];
-stories.forEach((element) { 
+  List<StoryModel> sotriesedited = [];
+  void sumstories() {
+    sotriesedited = [];
+    stories.forEach((element) {
+      if (sotriesedited.every((e) => e.uId != element.uId)) {
+        sotriesedited.add(element);
+      }
+    });
+  }
 
-if( sotriesedited.every((e) => e.uId != element.uId))
-{
-  sotriesedited.add(element);
-}
-});
+  Future<void> checkstorytimefordelete() async {
+    FirebaseFirestore.instance.collection('stories').get().then((value) {
+      var now = Timestamp.now().toDate();
 
-
-}
-
+      value.docs.forEach((element) {
+        Timestamp storydate = element.data()['time'];
+        var diffrece = now.difference(storydate.toDate());
+        if (diffrece.inMinutes >= 1440) element.reference.delete();
+      });
+    }).catchError(onError);
+  }
 
   void getStories() {
     stories = [];
     emit(SocialGetStoriesLoadingState());
     FirebaseFirestore.instance.collection('stories').get().then((value) {
-      value.docs.forEach((element) {    
-           stories.add(StoryModel.fromJson(element.data()));       
+      value.docs.forEach((element) {
+        stories.add(StoryModel.fromJson(element.data()));
         emit(SocialGetStoriesSuccessState());
       });
-    }).
-    catchError((e) {
+    }).then((_) {
+      sumstories();
+    }).catchError((e) {
       emit(SocialGetStoriesErrorState());
+      print(e.toString());
+    });
+  }
+
+  void getSinglePost(String posid) {
+    emit(SocialGetsinglePostLoading());
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(posid)
+        .get()
+        .then((value) {
+      value.reference.collection('Likes').get().then((value) {
+        postsLikesbymap[posid] = value.docs.length;
+        emit(SocialGetSinglepostLikesSuccess());
+      }).catchError(onError);
+      value.reference.collection('comments').get().then((value) {
+        postsCommentsbymap[posid] = value.docs.length;
+        emit(SocialGetSinglepostCommentsSuccess());
+      }).catchError(onError);
+      emit(SocialGetsinglePostSuccess());
+    }).catchError((e) {
+      emit(SocialGetsinglePostError());
       print(e.toString());
     });
   }
@@ -710,8 +799,11 @@ if( sotriesedited.every((e) => e.uId != element.uId))
     postsId = [];
     users = [];
     myposts = [];
-    stories =[];
+    stories = [];
     emit(SocialGetpostLoadingState());
+    checkstorytimefordelete().then((_) {
+      getStories();
+    }).catchError(onError);
     getStories();
     FirebaseFirestore.instance
         .collection('posts')
@@ -748,6 +840,42 @@ if( sotriesedited.every((e) => e.uId != element.uId))
       emit(SocialGetpostSuccessState());
     }).catchError((error) {
       emit(SocialGetpostErrorState(error.toString()));
+    });
+  }
+
+  void unlikePost(String postid) {
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
+        .collection('Likes')
+        .doc(usermodel!.uId)
+        .delete()
+        .then((value) {
+      mylikedpostslist.remove(postid);
+      emit(SocialPostUNlikesSuccessState());
+      getSinglePost(postid);
+    }).catchError((error) {
+      error.toString();
+      emit(SocialPostlikeErrorState(error.toString()));
+    });
+  }
+
+  void likePost(String postid) {
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postid)
+        .collection('Likes')
+        .doc(usermodel!.uId)
+        .set({
+      'uId': usermodel!.uId,
+      'like': true,
+    }).then((value) {
+      mylikedpostslist.add(postid);
+      emit(SocialPostlikesSuccessState());
+      getSinglePost(postid);
+    }).catchError((error) {
+      error.toString();
+      emit(SocialPostlikeErrorState(error.toString()));
     });
   }
 }
