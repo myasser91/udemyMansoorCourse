@@ -98,17 +98,17 @@ class OnBoarding extends StatelessWidget {
     pages = [];
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/shop1.png',
+          'images/social1.png',
         ),
         title: 'Hello'));
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/shop2.png',
+          'images/social2.png',
         ),
         title: 'Welcome'));
     pages.add(OnBoardingPagemodel(
         image: Image.asset(
-          'images/shop3.png',
+          'images/social3.png',
         ),
         title: 'To OUR SHOP'));
   }
