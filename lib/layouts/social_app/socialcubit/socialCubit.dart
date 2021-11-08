@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
@@ -28,11 +28,10 @@ class SocialCubit extends Cubit<SocialStates> {
 
   static SocialCubit get(context) => BlocProvider.of(context);
   bool profilepicIsSelected = false;
-  bool StoryimageSelected = false;
+  bool storyimageSelected = false;
   bool messageimageselected = false;
   bool coverpicisselected = false;
-  bool firsttime = true;
-  bool firsttimechats = true;
+  bool firsttime = true; 
   SocialUserModel? usermodel;
   int currentIndex = 0;
   Map<String, int> postsLikesbymap = ({});
@@ -41,14 +40,18 @@ class SocialCubit extends Cubit<SocialStates> {
   Map<String, PostfeedUserData> postownerdetails = ({});
   List<PostModel> myposts = [];
   List<StoryModel> stories = [];
-  List<StoryModel> storiesperperson = [];
-  List<String> postuId = [];
-  List<LikesModel> likedpost = [];
+  List<StoryModel> storiesperperson = [];  
   List<dynamic> postsnumber = [];
   List<PostModel> posts = [];
   List<String> postsId = [];
-  List<CommentModel> postComments = [];
-  List<String> postlikes = [];
+  List<CommentModel> postComments = []; 
+  File? storyimage;
+  File? postimage;
+  File? messageimage;
+  List<SocialUserModel> users = [];
+  var picker = ImagePicker();
+  List<MessageModel> messages = [];
+  List<StoryModel> sotriesedited = [];
 
   List<Widget> screens = [
     FeedsScreen(),
@@ -64,9 +67,25 @@ class SocialCubit extends Cubit<SocialStates> {
     'USers',
     'Settings',
   ];
+ void changeBottomNav(int index) {
+    if (index == 4 && firsttime == true) {
+      getUserData();
+      getpostsnumber();
+      firsttime = false;
+    }
+    if (index == 1) {
+      // getUserData();
+      getUsers();
+    }
+    if (index == 2) {
+      emit(SocialNewPostState());
+    } else {
+      currentIndex = index;
+      emit(SocialChangeBottomNavState());
+    }
+  }
 
-  var picker = ImagePicker();
-  File? storyimage;
+
   Future<void> getStoryImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -75,7 +94,7 @@ class SocialCubit extends Cubit<SocialStates> {
 
       print(' the Storyimage path is  $storyimage');
       emit(SocialStoryImagePicckedSuccessState());
-      StoryimageSelected = true;
+      storyimageSelected = true;
     } else {
       print('No image selected.');
       emit(SocialStoryImagePicckedErrorState());
@@ -149,7 +168,7 @@ class SocialCubit extends Cubit<SocialStates> {
           storyimage: value,
         );
 
-        StoryimageSelected = false;
+        storyimageSelected = false;
       }).catchError((error) {
         emit(SocialStoryImageUploadErrorState());
       });
@@ -277,11 +296,70 @@ class SocialCubit extends Cubit<SocialStates> {
       emit(SocialGetUserErrorState(error.toString()));
     });
   }
+void getUsers() {
+    users = [];
+    emit(SocialGetAllUsersLoadingState());
+    FirebaseFirestore.instance.collection('users').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.data()['uId'] != uId)
+          users.add(SocialUserModel.fromJson(element.data()));
+        emit(SocialGetAllUsersSuccessState());
+      });
+    }).catchError((error) {
+      emit(SocialGetAllUsersErrorState(error.toString()));
+    });
+  }
 
-/////////////////////// posts
+  void updatepostsdata() {
+    FirebaseFirestore.instance.collection('stories').get().then((value) {
+      value.docs.forEach((element) {
+        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
+          element.reference
+              .update({'name': usermodel!.name, 'image': usermodel!.image})
+              .then((_) {})
+              .catchError((e) {
+                e.toString();
+              });
+        }
+      });
+      emit(SocialUpdatepostsdataSucessState());
+    }).catchError((e) {
+      emit(SocialUpdatepostsdataErrorState());
+      print(e.toString());
+    });
 
-  File? postimage;
-  File? messageimage;
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach((element) {
+        element.reference.collection('comments').get().then((value) {
+          value.docs.forEach((element) {
+            if (element.data()['userId'] ==
+                FirebaseAuth.instance.currentUser!.uid) {
+              element.reference
+                  .update(
+                      {'name': usermodel!.name, 'userImage': usermodel!.image})
+                  .then((_) {})
+                  .catchError((e) {
+                    e.toString();
+                  });
+            }
+          });
+        }).catchError(onError);
+
+        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
+          element.reference
+              .update({'name': usermodel!.name, 'image': usermodel!.image})
+              .then((_) {})
+              .catchError((e) {
+                e.toString();
+              });
+        }
+      });
+      emit(SocialUpdatepostsdataSucessState());
+    }).catchError((e) {
+      emit(SocialUpdatepostsdataErrorState());
+      print(e.toString());
+    });
+  }
 
   Future<void> getpostimage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -378,34 +456,16 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  void changeBottomNav(int index) {
-    if (index == 4 && firsttime == true) {
-      getUserData();
-      getpostsnumber();
-      firsttime = false;
-    }
-    if (index == 1) {
-      // getUserData();
-      getUsers();
-    }
-    if (index == 2) {
-      emit(SocialNewPostState());
-    } else {
-      currentIndex = index;
-      emit(SocialChangeBottomNavState());
-    }
-  }
+ 
 
   void comment(
       {required String postid,
-     
       required String name,
       required String userImage,
       required String userId,
       required String text,
       required String dateTime}) {
     CommentModel model = CommentModel(
-     
       text: text,
       dateTime: dateTime,
       postid: postid,
@@ -438,90 +498,7 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  List<SocialUserModel> users = [];
-  void getUsers() {
-    users = [];
-    emit(SocialGetAllUsersLoadingState());
-    FirebaseFirestore.instance.collection('users').get().then((value) {
-      value.docs.forEach((element) {
-        if (element.data()['uId'] != uId)
-          users.add(SocialUserModel.fromJson(element.data()));
-        emit(SocialGetAllUsersSuccessState());
-      });
-    }).catchError((error) {
-      emit(SocialGetAllUsersErrorState(error.toString()));
-    });
-  }
-
-// void updatecommentsavatar()
-// {
-// FirebaseFirestore.instance.collection('posts').get().then((value) {
-//       value.docs.forEach((element) {
-//         element.reference.collection('comments').get()
-//         if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
-//           element.reference
-//               .update({'name': usermodel!.name, 'image': usermodel!.image})
-//               .then((_) {})
-//               .catchError((e) {
-//                 e.toString();
-//               });
-//         }
-//       });
-//     }).catchError((e) {
-//       print(e.toString());
-//     });
-
-// }
-
-  void updatepostsdata() {
-    FirebaseFirestore.instance.collection('stories').get().then((value) {
-      value.docs.forEach((element) {
-        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
-          element.reference
-              .update({'name': usermodel!.name, 'image': usermodel!.image})
-              .then((_) {})
-              .catchError((e) {
-                e.toString();
-              });
-        }
-      });
-      emit(SocialUpdatepostsdataSucessState());
-    }).catchError((e) {
-      emit(SocialUpdatepostsdataErrorState());
-      print(e.toString());
-    });
-
-    FirebaseFirestore.instance.collection('posts').get().then((value) {
-      value.docs.forEach((element) {
-        element.reference.collection('comments').get().then((value) {
-          value.docs.forEach((element) {
-            if (element.data()['userId'] ==
-                FirebaseAuth.instance.currentUser!.uid) {
-              element.reference
-                  .update({'name': usermodel!.name, 'userImage': usermodel!.image})
-                  .then((_) {})
-                  .catchError((e) {
-                    e.toString();
-                  });
-            }
-          });
-        }).catchError(onError);
-
-        if (element.data()['uId'] == FirebaseAuth.instance.currentUser!.uid) {
-          element.reference
-              .update({'name': usermodel!.name, 'image': usermodel!.image})
-              .then((_) {})
-              .catchError((e) {
-                e.toString();
-              });
-        }
-      });
-      emit(SocialUpdatepostsdataSucessState());
-    }).catchError((e) {
-      emit(SocialUpdatepostsdataErrorState());
-      print(e.toString());
-    });
-  }
+  
 
   void deletesinglecomment(String postid, String commentId) {
     emit(SocialdeleteCommentLoadingState());
@@ -532,13 +509,10 @@ class SocialCubit extends Cubit<SocialStates> {
         .doc(commentId)
         .delete()
         .then((_) {
-         
-          getPostComments(postid);
-          getSinglePost(postid);
-          
-      emit(SocialdeleteCommentSuccessState());
-      
+      getPostComments(postid);
+      getSinglePost(postid);
 
+      emit(SocialdeleteCommentSuccessState());
     }).catchError((e) {
       print(e.toString());
       emit(SocialdeleteCommentErrorState());
@@ -564,24 +538,7 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  ///////////////waiting
-  void getPostLikes(String? postId) {
-    postlikes = [];
-    emit(SocialGetPostCommentsLoadingState());
-    FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postId)
-        .collection('likes')
-        .get()
-        .then((value) {
-      value.docs.forEach((element) {
-        postlikes.add((element.data()['name']));
-      });
-      emit(SocialGetPostCommentsSuccessState());
-    }).catchError((error) {
-      emit(SocialGetPostCommentsErrorState());
-    });
-  }
+ 
 
   void getpostsnumber() {
     postsnumber = [];
@@ -635,7 +592,6 @@ class SocialCubit extends Cubit<SocialStates> {
     }
   }
 
-  List<MessageModel> messages = [];
   void getMessages({
     required String recieverId,
   }) {
@@ -730,8 +686,7 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  List<StoryModel> sotriesedited = [];
-  void sumstories() {
+  void sumstoriesOfSamePerson() {
     sotriesedited = [];
     stories.forEach((element) {
       if (sotriesedited.every((e) => e.uId != element.uId)) {
@@ -761,7 +716,7 @@ class SocialCubit extends Cubit<SocialStates> {
         emit(SocialGetStoriesSuccessState());
       });
     }).then((_) {
-      sumstories();
+      sumstoriesOfSamePerson();
     }).catchError((e) {
       emit(SocialGetStoriesErrorState());
       print(e.toString());

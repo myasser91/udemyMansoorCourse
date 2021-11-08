@@ -70,7 +70,7 @@ class SocialLayout extends StatelessWidget {
 
                     SocialCubit.get(context).messages = [];
                     SocialCubit.get(context).firsttime = true;
-                    SocialCubit.get(context).firsttimechats = true;
+                  
                     print(SocialCubit.get(context).users.length);
 
                     profileImage = null;
