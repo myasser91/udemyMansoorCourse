@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:messenger/layouts/news_app/cubit/states.dart';
 // ignore: unused_import
 import 'package:messenger/main.dart';
+
+import 'package:messenger/models/NewsModels/topheadlineModel.dart';
+
 import 'package:messenger/modules/newsmodules/Bussiness/Bussiness_screen.dart';
 import 'package:messenger/modules/newsmodules/science/science_screen.dart';
 import 'package:messenger/modules/newsmodules/sport/sport_screen.dart';
@@ -28,6 +31,7 @@ class NewsCubit extends Cubit<NewsStates> {
     SportScreen(),
   ];
   List<dynamic> business = [];
+
   List<dynamic> search = [];
   List<dynamic> sport = [];
   List<dynamic> science = [];
@@ -37,7 +41,7 @@ class NewsCubit extends Cubit<NewsStates> {
     if (index == 1) getScience();
     emit(NewsBottomState());
   }
-
+Headlines? searchlist;
   void getsearch(String value) {
     emit(NewsGetSearchLoadingState());
 
@@ -45,11 +49,12 @@ class NewsCubit extends Cubit<NewsStates> {
       url: 'v2/everything',
       query: {
         'q': '$value',
-        'apikey': '5f2798d699894a6db8f39336271e068a',
+        'apikey': 'f8022dac10334ba6b032b67fa50f2ea3',
       },
     ).then((value) {
-      search = value.data['articles'];
-      print(search[0]['title']);
+      
+      searchlist = Headlines.fromJson(value.data);
+    
       emit(NewsGetSearchSucsessState());
     }).catchError((error) {
       print(error.toString());
@@ -57,6 +62,7 @@ class NewsCubit extends Cubit<NewsStates> {
     });
   }
 
+  Headlines? news;
   void getBusiness() {
     emit(NewsLoadingState());
     DioHelper.getData(
@@ -64,11 +70,11 @@ class NewsCubit extends Cubit<NewsStates> {
       query: {
         'country': 'eg',
         'category': 'business',
-        'apikey': '5f2798d699894a6db8f39336271e068a',
+        'apikey': 'f8022dac10334ba6b032b67fa50f2ea3',
       },
     ).then((value) {
-      business = value.data['articles'];
-      print(business[0]['title']);
+      news = Headlines.fromJson(value.data);
+
       emit(NewsGetBusinessSucsessState());
     }).catchError((error) {
       print(error.toString());
@@ -76,6 +82,7 @@ class NewsCubit extends Cubit<NewsStates> {
     });
   }
 
+  Headlines? newssport;
   void getSports() {
     emit(SportsLoadingState());
     DioHelper.getData(
@@ -83,11 +90,10 @@ class NewsCubit extends Cubit<NewsStates> {
       query: {
         'country': 'eg',
         'category': 'sports',
-        'apikey': '5f2798d699894a6db8f39336271e068a',
+        'apikey': 'f8022dac10334ba6b032b67fa50f2ea3',
       },
     ).then((value) {
-      sport = value.data['articles'];
-      print(sport[0]['title']);
+      newssport = Headlines.fromJson(value.data);
       emit(NewsGetSportsSucsessState());
     }).catchError((error) {
       print(error.toString());
@@ -107,6 +113,7 @@ class NewsCubit extends Cubit<NewsStates> {
     });
   }
 
+  Headlines? newsSience;
   void getScience() {
     emit(NewsLoadingState());
     DioHelper.getData(
@@ -114,11 +121,10 @@ class NewsCubit extends Cubit<NewsStates> {
       query: {
         'country': 'eg',
         'category': 'science',
-        'apikey': '5f2798d699894a6db8f39336271e068a',
+        'apikey': 'f8022dac10334ba6b032b67fa50f2ea3',
       },
     ).then((value) {
-      science = value.data['articles'];
-      print(science[0]['title']);
+      newsSience = Headlines.fromJson(value.data);
       emit(NewsGetScienceSucsessState());
     }).catchError((error) {
       print(error.toString());

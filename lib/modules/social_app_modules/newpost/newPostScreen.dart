@@ -29,6 +29,7 @@ class NewPostScreen extends StatelessWidget {
       builder: (context, state) {
         var cubit = SocialCubit.get(context);
         return Scaffold(
+          
           appBar: AppBar(
             leading: IconButton(
                 onPressed: () {

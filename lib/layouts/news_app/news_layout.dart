@@ -22,17 +22,27 @@ class NewsLayout extends StatelessWidget {
         var cubit = NewsCubit.get(context);
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: Colors.black,
             actions: [
-              IconButton(onPressed: () {
-                NewsCubit.get(context).search = [];
-NavigateTo(context, SearchScreen());
-
-
-              }, icon: Icon(Icons.search_rounded)),
               IconButton(
                   onPressed: () {
+                    NewsCubit.get(context).search = [];
+                    NavigateTo(context, SearchScreen());
+                  },
+                  icon: Icon(Icons.search_rounded)),
+              IconButton(
+                  onPressed: () {
+                    print('${NewsCubit.get(context).news!.articles!.length}');
+
+                    NewsCubit.get(context).news!.articles!.forEach((element) {
+                         print('the title is${element.title}');
+                      print('the decription is${element.description}');
+                      print('the urlto image is ${element.urlToImage}');
+                      print('the publish at is ${element.publishedAt}');
+                      print('----------------------------------------------------------------------');
+                    });
+
                     NewsCubit.get(context).darkmodetoggle();
-                    
                   },
                   icon: Icon(NewsCubit.get(context).isDark
                       ? Icons.dark_mode

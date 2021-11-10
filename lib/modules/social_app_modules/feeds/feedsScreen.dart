@@ -22,7 +22,6 @@ import 'package:messenger/styles/iconBroken.dart';
 import 'package:path/path.dart';
 
 class FeedsScreen extends StatelessWidget {
-  
   var indicatorcontroller = IndicatorController();
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,7 @@ class FeedsScreen extends StatelessWidget {
         if (state is SocialStoryImagePicckedSuccessState) {
           NavigateTo(context, AddStory());
         }
-        
+
         if (state is SocialGetPostCommentsSuccessState) {
           showModalBottomSheet(
               backgroundColor: Colors.grey[300],
@@ -45,7 +44,8 @@ class FeedsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20.0),
                     child: ListView.separated(
                         itemBuilder: (context, index) => buildCommentItem(
-                            SocialCubit.get(context).postComments[index],context),
+                            SocialCubit.get(context).postComments[index],
+                            context),
                         separatorBuilder: (context, index) => SizedBox(
                               height: 1,
                             ),
@@ -134,15 +134,15 @@ class FeedsScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) => buildPostItem(
-                        SocialCubit.get(context).postownerdetails,
-                        SocialCubit.get(context).mylikedpostslist,
-                        SocialCubit.get(context).postsLikesbymap,
-                        SocialCubit.get(context).postsCommentsbymap,
-                        SocialCubit.get(context).postsId[index],
-                        SocialCubit.get(context).posts[index],
-                        context,
-                        index,
-                        ),
+                      SocialCubit.get(context).postownerdetails,
+                      SocialCubit.get(context).mylikedpostslist,
+                      SocialCubit.get(context).postsLikesbymap,
+                      SocialCubit.get(context).postsCommentsbymap,
+                      SocialCubit.get(context).postsId[index],
+                      SocialCubit.get(context).posts[index],
+                      context,
+                      index,
+                    ),
                     separatorBuilder: (context, index) => SizedBox(
                       height: 1,
                     ),
@@ -157,16 +157,16 @@ class FeedsScreen extends StatelessWidget {
   }
 
   Widget buildPostItem(
-      Map<String, PostfeedUserData> postownerdetails,
-      List<String> mylikedpostslist,
-      Map<String, int> likes,
-      Map<String, int> comments,
-      String postId,
-      PostModel model,
-      context,
-      index,
-      ) {
-        var text = TextEditingController();
+    Map<String, PostfeedUserData> postownerdetails,
+    List<String> mylikedpostslist,
+    Map<String, int> likes,
+    Map<String, int> comments,
+    String postId,
+    PostModel model,
+    context,
+    index,
+  ) {
+    var text = TextEditingController();
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8),
       child: BlocConsumer<Appcubit, Appstates>(
@@ -229,10 +229,55 @@ class FeedsScreen extends StatelessWidget {
                               <PopupMenuEntry>[
                             PopupMenuItem(
                               height: 7,
-                              onTap: () {
-                                SocialCubit.get(context).deletepost(postId);
-                              },
-                              child: Text('remove'),
+                              onTap: () {},
+                              child: TextButton(
+                                child: Text('remove'),
+                                onPressed: () {
+                                  var alert = AlertDialog(title: Text('Alert ! '),titlePadding: EdgeInsets.all(10),
+                                    content: Container(
+                                      width: 150,
+                                      height: 150,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Container(color: Colors.black,child: SizedBox(height: 1,width: double.infinity,)),
+                                          SizedBox(),
+                                          Text(
+                                              'are you sure you want to delete the post ?'),
+                                          Spacer(),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('NO'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  SocialCubit.get(context)
+                                                      .deletepost(postId);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('YES'),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                  showDialog(barrierColor: Colors.grey.withOpacity(.6),barrierLabel: 'dsadsasadsadasdasdddsad',
+                                      context: context,
+                                      builder: (context) => alert);
+                                },
+                              ),
                             ),
                           ],
                         )
@@ -506,7 +551,7 @@ class FeedsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildCommentItem(CommentModel model,context) {
+  Widget buildCommentItem(CommentModel model, context) {
     return Container(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -547,22 +592,22 @@ class FeedsScreen extends StatelessWidget {
                         ],
                       ),
                       Spacer(),
-                      ],
+                    ],
                   ),
                 ),
               ),
             ),
-          if(model.userId == FirebaseAuth.instance.currentUser!.uid)
-            Container(width: 20,
-              child: IconButton(
-                            onPressed: () {
-                              SocialCubit.get(context).deletesinglecomment(
-                                  model.postid!, model.commentId!);
-                                 Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.delete_forever_outlined)),
-            )
-                 
+            if (model.userId == FirebaseAuth.instance.currentUser!.uid)
+              Container(
+                width: 20,
+                child: IconButton(
+                    onPressed: () {
+                      SocialCubit.get(context)
+                          .deletesinglecomment(model.postid!, model.commentId!);
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.delete_forever_outlined)),
+              )
           ],
         ),
       ),
@@ -602,15 +647,21 @@ class FeedsScreen extends StatelessWidget {
               SizedBox(
                 height: 2,
               ),
-              Text(
-                model.name!,
-                maxLines: 2,
-                style: TextStyle(
+              mytext(
+                  text: model.name!,
+                  fontsize: 8,
                   height: 1,
-                  fontSize: 8,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+                  maxlines: 2,
+                  overflow: TextOverflow.ellipsis)
+              // Text(
+              //   model.name!,
+              //   maxLines: 2,
+              //   style: TextStyle(
+              //     height: 1,
+              //     fontSize: 8,
+              //   ),
+              //   overflow: TextOverflow.ellipsis,
+              // ),
             ],
           ),
         ),

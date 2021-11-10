@@ -1,10 +1,17 @@
 // ignore_for_file: unused_import, non_constant_identifier_names
 
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:messenger/layouts/news_app/cubit/cubit.dart';
 import 'package:messenger/layouts/shopApp/cubit/shopcubit.dart';
+
+import 'package:messenger/models/NewsModels/topheadlineModel.dart';
 import 'package:messenger/models/ShopModels/favoritesModel.dart';
 import 'package:messenger/models/ShopModels/homemodel.dart';
 import 'package:messenger/models/ShopModels/searchModel.dart';
@@ -15,6 +22,26 @@ import 'package:messenger/shared/cubit/states.dart';
 import 'package:path/path.dart';
 import 'package:tbib_toast/tbib_toast.dart';
 
+Widget mytext({
+  required String text,
+  double? fontsize,
+  FontWeight? weight,
+  double? height,
+  int? maxlines,
+  TextOverflow? overflow,
+}) =>
+    Text(
+      text,
+      maxLines: maxlines,
+      style: TextStyle(
+        height: height ?? 1,
+        color: Colors.black,
+        fontSize: fontsize ?? 14,
+        fontWeight: weight ?? FontWeight.normal,
+        overflow: overflow,
+      ),
+    );
+
 Widget defaultButtom({
   double width = double.infinity,
   Color background = Colors.black,
@@ -22,7 +49,6 @@ Widget defaultButtom({
   required Function onpress,
   required String text,
   Color bottomcolor = defaultColor,
-  
 }) =>
     Container(
       decoration: BoxDecoration(
@@ -35,7 +61,8 @@ Widget defaultButtom({
         },
         child: Text(
           text.toUpperCase(),
-          style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.bold ),
+          style: TextStyle(
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -55,12 +82,13 @@ Widget defaultFormField({
   bool isclickable = true,
 }) =>
     TextFormField(
-      
       obscureText: isPass ? true : false,
       controller: controller,
       enabled: isclickable,
-      decoration: InputDecoration(filled: true,
-        labelText: labelText,labelStyle: TextStyle(color: Colors.grey),
+      decoration: InputDecoration(
+        filled: true,
+        labelText: labelText,
+        labelStyle: TextStyle(color: Colors.grey),
         prefixIcon: Icon(prefixIcon),
         suffixIcon: IconButton(
           icon: Icon(suffixIcon),
@@ -80,7 +108,6 @@ Widget defaultFormField({
       onTap: () => onTap!(),
       keyboardType: type,
     );
-
 
 Widget Buildtaskitem(Map model, context) => Dismissible(
       key: Key(model['id'].toString()),
@@ -145,11 +172,11 @@ Widget Buildtaskitem(Map model, context) => Dismissible(
       },
     );
 
-Widget Buildarticle(list, context, {issearch = false}) {
-  return list.length > 0
+Widget Buildarticle(list, context, int count, {issearch = false}) {
+  return NewsCubit.get(context).newssport!.articles!.length > 0
       ? ListView.separated(
           physics: BouncingScrollPhysics(),
-          itemCount: 20,
+          itemCount: count,
           separatorBuilder: (context, index) => SizedBox(
                 height: 5,
               ),
@@ -159,12 +186,15 @@ Widget Buildarticle(list, context, {issearch = false}) {
 }
 
 Widget BuildArticleitem(
-  article,
+  Article article,
   context,
 ) {
+  if (article.urlToImage == null)
+    article.urlToImage =
+        'https://play-lh.googleusercontent.com/aCyq5_tBBCKcD5f4yuiE3kaNc1HDbPLA7Tq7PoEqBk1RVODSqJQUYpB_ekCrW23qnhw';
   return InkWell(
     onTap: () {
-      NavigateTo(context, WebViewScreen(article['url']));
+      NavigateTo(context, WebViewScreen(article.url!));
     },
     child: Padding(
       padding: const EdgeInsets.all(20.0),
@@ -176,7 +206,7 @@ Widget BuildArticleitem(
             decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: NetworkImage('${article['urlToImage']}')),
+                    image: NetworkImage(article.urlToImage!)),
                 borderRadius: BorderRadius.circular(18)),
           ),
           SizedBox(
@@ -191,14 +221,16 @@ Widget BuildArticleitem(
                 children: [
                   Expanded(
                     child: Text(
-                      '${article['title']}',
+                      article.title != null ? article.title! : '',
                       style: Theme.of(context).textTheme.bodyText1,
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Text(
-                    '${article['publishedAt']}',
+                    article.publishedAt != null
+                        ? '${article.publishedAt.toString()}'
+                        : '',
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                 ],
@@ -243,7 +275,11 @@ void showToast({
 }) =>
     Toast.show(t, context, backgroundColor: chooseToastColor(state));
 
-Widget favoritesitem(Product?model , context,) => Padding(
+Widget favoritesitem(
+  Product? model,
+  context,
+) =>
+    Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
         height: 120,
@@ -349,8 +385,11 @@ Widget favoritesitem(Product?model , context,) => Padding(
       ),
     );
 
-
-Widget SearchItem(Products ?model, context,) => Padding(
+Widget SearchItem(
+  Products? model,
+  context,
+) =>
+    Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
         height: 120,
@@ -421,7 +460,7 @@ Widget SearchItem(Products ?model, context,) => Padding(
                       SizedBox(
                         width: 20,
                       ),
-                       Spacer(),
+                      Spacer(),
                       IconButton(
                           onPressed: () {
                             ShopCubit.get(context).changeFavorite(model.id!);
@@ -444,48 +483,45 @@ Widget SearchItem(Products ?model, context,) => Padding(
       ),
     );
 
-
-           
-           Widget emailverification(){
-             return   Container(
-                  height: 50,
-                  color: Colors.amber,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Icon(Icons.info_outline),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                          child: Text(
-                        '  please verify your email',
-                        style: TextStyle(color: Colors.black),
-                      )),
-                      defaultButtom(
-                        width: 80,
-                        bottomcolor: Colors.transparent,
-                        onpress: () {
-                          FirebaseAuth.instance.currentUser!
-                              .sendEmailVerification()
-                              .then((value) {
-                            showToast(
-                                context: context,
-                                t: 'Check your Email',
-                                state: ToastStates.SUCCESS);
-                          }).catchError((error) {
-                            print(error.toString());
-                          });
-                        },
-                        text: 'send',
-                      ),
-                    ],
-                  ),
-                );
-         
-           }
+Widget emailverification() {
+  return Container(
+    height: 50,
+    color: Colors.amber,
+    child: Row(
+      children: [
+        SizedBox(
+          width: 5,
+        ),
+        Icon(Icons.info_outline),
+        SizedBox(
+          width: 5,
+        ),
+        Expanded(
+            child: Text(
+          '  please verify your email',
+          style: TextStyle(color: Colors.black),
+        )),
+        defaultButtom(
+          width: 80,
+          bottomcolor: Colors.transparent,
+          onpress: () {
+            FirebaseAuth.instance.currentUser!
+                .sendEmailVerification()
+                .then((value) {
+              showToast(
+                  context: context,
+                  t: 'Check your Email',
+                  state: ToastStates.SUCCESS);
+            }).catchError((error) {
+              print(error.toString());
+            });
+          },
+          text: 'send',
+        ),
+      ],
+    ),
+  );
+}
           //   (!FirebaseAuth.instance.currentUser!.emailVerified)
           //        },
           // ),   return if

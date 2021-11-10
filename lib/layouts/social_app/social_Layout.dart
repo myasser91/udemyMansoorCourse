@@ -37,7 +37,17 @@ class SocialLayout extends StatelessWidget {
         var cubit = SocialCubit.get(context);
 
         return Scaffold(
+
+
           appBar: AppBar(
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                Colors.white,
+                Colors.grey,
+                Colors.black,
+              ])),
+            ),
             title: Text(
               cubit.titles[cubit.currentIndex],
             ),
@@ -48,8 +58,17 @@ class SocialLayout extends StatelessWidget {
                   return IconButton(
                       color: Colors.grey,
                       onPressed: () {
+                        final x = AlertDialog(content: Container(
+                          
+                        ),
+                          actions: [
+                            defaultButtom(onpress: (){}, text: 'text')
+                          ],
+                        );
+
                         Appcubit.get(context).darkmodetoggle();
-                      print(SocialCubit.get(context).usermodel!.name!);
+                        print(SocialCubit.get(context).usermodel!.name!);
+                        showDialog(context: context, builder: (context)=> x);
                       },
                       icon: Icon(Icons.dark_mode_outlined));
                 },
@@ -57,8 +76,7 @@ class SocialLayout extends StatelessWidget {
               IconButton(
                   color: Colors.grey,
                   onPressed: () {
-                  SocialCubit.get(context).checkstorytimefordelete();
-                    
+                    SocialCubit.get(context).checkstorytimefordelete();
                   },
                   icon: Icon(IconBroken.Notification)),
               IconButton(
@@ -70,7 +88,7 @@ class SocialLayout extends StatelessWidget {
 
                     SocialCubit.get(context).messages = [];
                     SocialCubit.get(context).firsttime = true;
-                  
+
                     print(SocialCubit.get(context).users.length);
 
                     profileImage = null;

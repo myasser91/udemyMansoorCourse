@@ -41,6 +41,7 @@ import 'package:messenger/modules/social_app_modules/chats/chatsScreen.dart';
 import 'package:messenger/modules/social_app_modules/social_Register_screen/home.dart';
 import 'package:messenger/modules/social_app_modules/social_login_screen/social_login_screen.dart';
 import 'package:messenger/modules/social_app_modules/story.dart';
+import 'package:messenger/modules/social_app_modules/test.dart';
 import 'package:messenger/shared/components/components.dart';
 import 'package:messenger/shared/components/themes.dart';
 import 'package:messenger/shared/cubit/cubit.dart';
@@ -153,11 +154,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        //   BlocProvider(
-        //  create: (BuildContext context) => NewsCubit()
-        //      // ..getBusiness()
-        //       ..darkmodetoggle(fromshared: isDark),
-        //   ),
+          BlocProvider(
+         create: (BuildContext context) => NewsCubit()
+             ..getBusiness()..getScience()..getSports()
+              ..darkmodetoggle(fromshared: isDark),
+          ),
         BlocProvider(
             create: (BuildContext context) =>
                 Appcubit()..darkmodetoggle(fromshared: isDark)),
@@ -178,7 +179,7 @@ class MyApp extends StatelessWidget {
                 Appcubit.get(context).isDark ? ThemeMode.dark : ThemeMode.light,
             debugShowCheckedModeBanner: false,
             darkTheme: AppThemeDark.appthemedark,
-            home: widget,
+            home: NewsLayout(),
           );
         },
       ),
