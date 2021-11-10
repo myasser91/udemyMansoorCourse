@@ -14,7 +14,7 @@ class SearchScreen extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
 
-      var list = NewsCubit.get(context).search;
+      var list = NewsCubit.get(context).searchlist!.articles;
         return Scaffold(
           appBar: AppBar(),
           body: Column(children: [
@@ -36,7 +36,7 @@ class SearchScreen extends StatelessWidget {
                 prefixIcon: Icons.search_sharp,
               ),
             ),
-            Expanded(child: Buildarticle(list, context,issearch: true)),
+            Expanded(child: Buildarticle(list, context,10,issearch: true,)),
           ]),
         );
       },
